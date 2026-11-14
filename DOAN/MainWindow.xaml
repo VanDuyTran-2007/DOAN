@@ -1,19 +1,62 @@
 ﻿<Window x:Class="DOAN.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DOAN"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Villa ĐHQG – Nhà khách Đại học Quốc gia TP.HCM"
+        Height="880" Width="1400" MinWidth="1120" MinHeight="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource CreamBrush}"
+        FontFamily="{StaticResource SansFont}"
+        TextOptions.TextFormattingMode="Display">
     <Grid>
+        <!-- Nội dung các trang -->
+        <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Focusable="False"
+               Navigated="MainFrame_Navigated" />
 
-        <Button>
-            click me
-        </Button>
+        <!-- Thanh điều hướng nằm đè lên trên ảnh -->
+        <Grid x:Name="NavBar" Height="78" VerticalAlignment="Top" Margin="0,0,9,0">
+            <Border x:Name="NavBg" Background="{StaticResource ForestDarkBrush}" Opacity="0" />
+            <Border x:Name="NavLine" VerticalAlignment="Bottom" Height="1" Background="{StaticResource WhiteLineBrush}" />
 
-        <Button>
-            click me
-        </Button>
+            <Grid Margin="48,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Logo -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Cursor="Hand"
+                            Background="Transparent" MouseLeftButtonUp="Logo_Click">
+                    <Border Width="42" Height="42" BorderBrush="{StaticResource BrassBrush}" BorderThickness="1.5">
+                        <TextBlock Text="Đ" FontFamily="{StaticResource SerifFont}" FontSize="24" Foreground="{StaticResource BrassBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-2,0,0" />
+                    </Border>
+                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="VILLA ĐHQG" FontFamily="{StaticResource SerifFont}" FontSize="20" Foreground="White" />
+                        <TextBlock Text="NHÀ KHÁCH ĐẠI HỌC QUỐC GIA TP.HCM" FontSize="9" FontWeight="SemiBold"
+                                   Foreground="{StaticResource BrassBrush}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Menu -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="NavHome" Content="TRANG CHỦ" Style="{StaticResource NavButton}" Click="NavHome_Click" />
+                    <Button x:Name="NavAbout" Content="GIỚI THIỆU" Style="{StaticResource NavButton}" Click="NavSection_Click" CommandParameter="about" />
+                    <Button x:Name="NavRooms" Content="PHÒNG NGHỈ" Style="{StaticResource NavButton}" Click="NavRooms_Click" />
+                    <Button x:Name="NavAmenities" Content="TIỆN ÍCH" Style="{StaticResource NavButton}" Click="NavSection_Click" CommandParameter="amenities" />
+                    <Button x:Name="NavGallery" Content="THƯ VIỆN ẢNH" Style="{StaticResource NavButton}" Click="NavSection_Click" CommandParameter="gallery" />
+                    <Button x:Name="NavContact" Content="LIÊN HỆ" Style="{StaticResource NavButton}" Click="NavSection_Click" CommandParameter="contact" />
+                </StackPanel>
+
+                <!-- Hotline + đặt phòng -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="&#xE717;" FontFamily="{StaticResource IconFont}" Foreground="{StaticResource BrassBrush}"
+                               VerticalAlignment="Center" FontSize="14" />
+                    <TextBlock x:Name="HotlineText" Foreground="White" FontSize="13" FontWeight="SemiBold"
+                               VerticalAlignment="Center" Margin="8,0,22,0" />
+                    <Button Content="ĐẶT PHÒNG" Style="{StaticResource PrimaryButton}" Padding="22,11" Click="NavRooms_Click" />
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

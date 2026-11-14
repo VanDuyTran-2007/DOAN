@@ -1,0 +1,437 @@
+<Page x:Class="DOAN.Pages.RoomDetailPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:fx="clr-namespace:DOAN.Helpers"
+      Title="Chi tiết phòng" Background="{StaticResource CreamBrush}">
+
+    <Page.Resources>
+        <!-- Ô thông số phòng -->
+        <Style x:Key="SpecTile" TargetType="Border">
+            <Setter Property="Background" Value="White" />
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="20,18" />
+            <Setter Property="Margin" Value="0,0,14,14" />
+        </Style>
+        <Style x:Key="SpecValue" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource SerifFont}" />
+            <Setter Property="FontSize" Value="19" />
+            <Setter Property="Foreground" Value="{StaticResource InkBrush}" />
+            <Setter Property="Margin" Value="0,10,0,2" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock" BasedOn="{StaticResource H3}">
+            <Setter Property="FontSize" Value="28" />
+            <Setter Property="Margin" Value="0,56,0,20" />
+        </Style>
+    </Page.Resources>
+
+    <ScrollViewer x:Name="Scroller" CanContentScroll="False" VerticalScrollBarVisibility="Auto"
+                  ScrollChanged="Scroller_ScrollChanged">
+        <StackPanel>
+
+            <!-- ============================ BANNER ============================ -->
+            <Grid Height="420" ClipToBounds="True" Background="{StaticResource ForestDarkBrush}">
+                <Image Source="{Binding Type.Cover, Converter={StaticResource Img}, ConverterParameter=1920}" Stretch="UniformToFill" />
+                <Border Background="{StaticResource BannerOverlay}" />
+                <Grid Margin="96,0,96,56" VerticalAlignment="Bottom" MaxWidth="1240">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                            <Button Content="&#xE72B;" Style="{StaticResource RoundButton}" Width="38" Height="38" FontSize="12"
+                                    Margin="0,0,16,0" Click="Back_Click" ToolTip="Quay lại" />
+                            <Button Content="Trang chủ" Style="{StaticResource FooterLink}" Margin="0" FontSize="13" VerticalAlignment="Center" Click="Home_Click" />
+                            <TextBlock Text="  /  " Foreground="{StaticResource WhiteSoftBrush}" FontSize="13" VerticalAlignment="Center" />
+                            <Button Content="Phòng nghỉ" Style="{StaticResource FooterLink}" Margin="0" FontSize="13" VerticalAlignment="Center" Click="Rooms_Click" />
+                            <TextBlock Text="{Binding Type.Name, StringFormat='  /  {0}'}" Foreground="{StaticResource BrassBrush}" FontSize="13" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Type.Category}" Style="{StaticResource Eyebrow}" FontSize="13" />
+                        <TextBlock Text="{Binding Type.Name}" Style="{StaticResource H1}" FontSize="58" Margin="0,8,0,20" />
+                        <StackPanel Orientation="Horizontal">
+                            <Path Data="{StaticResource IconBed}" Style="{StaticResource IconPath}" />
+                            <TextBlock Text="{Binding Type.BedType}" Foreground="White" FontSize="14" Margin="8,0,28,0" VerticalAlignment="Center" />
+                            <Path Data="{StaticResource IconGuests}" Style="{StaticResource IconPath}" />
+                            <TextBlock Text="{Binding Type.GuestsText}" Foreground="White" FontSize="14" Margin="8,0,28,0" VerticalAlignment="Center" />
+                            <Path Data="{StaticResource IconArea}" Style="{StaticResource IconPath}" Width="15" Height="15" />
+                            <TextBlock Text="{Binding Type.AreaText}" Foreground="White" FontSize="14" Margin="8,0,28,0" VerticalAlignment="Center" />
+                            <Path Data="{StaticResource IconView}" Style="{StaticResource IconPath}" />
+                            <TextBlock Text="{Binding Type.View}" Foreground="White" FontSize="14" Margin="8,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- ============================ NỘI DUNG ============================ -->
+            <Grid Margin="96,56,96,0" MaxWidth="1240">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="48" />
+                    <ColumnDefinition Width="390" />
+                </Grid.ColumnDefinitions>
+
+                <!-- ===== CỘT TRÁI ===== -->
+                <StackPanel>
+                    <!-- Thư viện ảnh -->
+                    <Grid Height="520" ClipToBounds="True" Background="{StaticResource SandBrush}">
+                        <Image x:Name="MainPhoto" Source="{Binding SelectedImage, Converter={StaticResource Img}, ConverterParameter=1400}"
+                               Stretch="UniformToFill" />
+                        <Button Content="&#xE76B;" Style="{StaticResource RoundButton}" HorizontalAlignment="Left" Margin="20,0,0,0"
+                                Background="#55000000" Click="PrevImage_Click" />
+                        <Button Content="&#xE76C;" Style="{StaticResource RoundButton}" HorizontalAlignment="Right" Margin="0,0,20,0"
+                                Background="#55000000" Click="NextImage_Click" />
+                        <Border Background="#99000000" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="20" Padding="14,6">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE91B;" FontFamily="{StaticResource IconFont}" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ImageCounter}" Foreground="White" FontSize="13" Margin="8,0,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <ItemsControl ItemsSource="{Binding Thumbs}" Margin="0,12,-12,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="Frame" Height="96" Margin="0,0,12,0" BorderThickness="2" BorderBrush="Transparent"
+                                        Background="{StaticResource SandBrush}" Cursor="Hand" MouseLeftButtonUp="Thumb_Click">
+                                    <Grid ClipToBounds="True">
+                                        <Image Source="{Binding Url, Converter={StaticResource Img}, ConverterParameter=300}" Stretch="UniformToFill" />
+                                        <Border x:Name="Dim" Background="#66FFFFFF" />
+                                    </Grid>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter TargetName="Frame" Property="BorderBrush" Value="{StaticResource BrassBrush}" />
+                                        <Setter TargetName="Dim" Property="Opacity" Value="0" />
+                                    </DataTrigger>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Dim" Property="Opacity" Value="0" />
+                                    </Trigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Tổng quan -->
+                    <TextBlock Text="Tổng quan" Style="{StaticResource SectionTitle}" />
+                    <TextBlock Text="{Binding Type.Description}" Style="{StaticResource Body}" FontSize="16" LineHeight="28" />
+
+                    <!-- Thông số -->
+                    <TextBlock Text="Thông tin phòng" Style="{StaticResource SectionTitle}" />
+                    <UniformGrid Columns="3" Margin="0,0,-14,0">
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconBed}" Style="{StaticResource IconPath}" Width="24" Height="24" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.Beds}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="Số giường" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconBed}" Style="{StaticResource IconPath}" Width="24" Height="24" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.BedType}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="Loại giường" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconGuests}" Style="{StaticResource IconPath}" Width="24" Height="24" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.MaxGuests, StringFormat={}{0} khách}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="Sức chứa tối đa" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconGuests}" Style="{StaticResource IconPath}" Width="24" Height="24" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.MaxAdults, StringFormat={}{0} người lớn}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="{Binding Type.MaxChildren, StringFormat=+ {0} trẻ em dưới 12 tuổi}" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconArea}" Style="{StaticResource IconPath}" Width="22" Height="22" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.AreaText}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="Diện tích" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource SpecTile}">
+                            <StackPanel>
+                                <Path Data="{StaticResource IconView}" Style="{StaticResource IconPath}" Width="24" Height="24" HorizontalAlignment="Left" />
+                                <TextBlock Text="{Binding Type.View}" Style="{StaticResource SpecValue}" />
+                                <TextBlock Text="Hướng nhìn" Style="{StaticResource Small}" />
+                            </StackPanel>
+                        </Border>
+                    </UniformGrid>
+
+                    <!-- Tiện nghi -->
+                    <TextBlock Text="Tiện nghi trong phòng" Style="{StaticResource SectionTitle}" />
+                    <ItemsControl ItemsSource="{Binding Type.Amenities}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                                    <Border Width="26" Height="26" CornerRadius="13" Background="{StaticResource SandBrush}">
+                                        <Path Data="{StaticResource IconCheck}" Style="{StaticResource IconPath}" Width="13" Height="13" Fill="{StaticResource ForestBrush}" />
+                                    </Border>
+                                    <TextBlock Text="{Binding}" FontSize="15" Foreground="{StaticResource InkBrush}" Margin="12,0,0,0" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Lịch 14 ngày -->
+                    <Grid Margin="0,56,0,20">
+                        <TextBlock Text="Tình trạng 14 ngày tới" Style="{StaticResource SectionTitle}" Margin="0" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                            <Border Width="12" Height="12" Background="{StaticResource SuccessBgBrush}" BorderBrush="{StaticResource SuccessBrush}" BorderThickness="1" />
+                            <TextBlock Text="Còn nhiều" Style="{StaticResource Small}" Margin="6,0,14,0" />
+                            <Border Width="12" Height="12" Background="{StaticResource WarningBgBrush}" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1" />
+                            <TextBlock Text="Còn ít" Style="{StaticResource Small}" Margin="6,0,14,0" />
+                            <Border Width="12" Height="12" Background="{StaticResource DangerBgBrush}" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1" />
+                            <TextBlock Text="Hết phòng" Style="{StaticResource Small}" Margin="6,0,14,0" />
+                            <Border Width="12" Height="12" BorderBrush="{StaticResource InkBrush}" BorderThickness="2" />
+                            <TextBlock Text="Ngày bạn ở" Style="{StaticResource Small}" Margin="6,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                    <ItemsControl ItemsSource="{Binding Days}" Margin="0,0,-6,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="7" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="Day" Margin="0,0,6,6" Padding="8,10" Background="{StaticResource SuccessBgBrush}"
+                                        BorderBrush="Transparent" BorderThickness="2">
+                                    <StackPanel HorizontalAlignment="Center">
+                                        <TextBlock Text="{Binding DayOfWeek}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock Text="{Binding DayText}" FontFamily="{StaticResource SerifFont}" FontSize="22"
+                                                   Foreground="{StaticResource InkBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock Text="{Binding MonthText}" FontSize="10" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock x:Name="Free" Text="{Binding FreeText}" FontSize="12" FontWeight="SemiBold" Margin="0,6,0,0"
+                                                   Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Level}" Value="Few">
+                                        <Setter TargetName="Day" Property="Background" Value="{StaticResource WarningBgBrush}" />
+                                        <Setter TargetName="Free" Property="Foreground" Value="{StaticResource WarningBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Level}" Value="None">
+                                        <Setter TargetName="Day" Property="Background" Value="{StaticResource DangerBgBrush}" />
+                                        <Setter TargetName="Free" Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding InStay}" Value="True">
+                                        <Setter TargetName="Day" Property="BorderBrush" Value="{StaticResource InkBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Danh sách phòng cụ thể -->
+                    <TextBlock Text="Danh sách phòng" Style="{StaticResource SectionTitle}" />
+                    <TextBlock Style="{StaticResource Small}" Margin="0,-10,0,16"
+                               Text="Trạng thái từng phòng trong khoảng ngày bạn đã chọn." />
+                    <ItemsControl ItemsSource="{Binding Units}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border x:Name="Unit" Width="150" Margin="0,0,12,12" Padding="16,14" Background="White"
+                                        BorderBrush="{StaticResource LineBrush}" BorderThickness="1,1,1,3">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Number}" FontFamily="{StaticResource SerifFont}" FontSize="19" Foreground="{StaticResource InkBrush}" />
+                                        <TextBlock Text="{Binding FloorText}" Style="{StaticResource Small}" FontSize="12" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                            <Ellipse x:Name="Dot" Width="8" Height="8" Fill="{StaticResource SuccessBrush}" VerticalAlignment="Center" />
+                                            <TextBlock x:Name="Label" Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource SuccessBrush}" Margin="6,0,0,0" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding IsFree}" Value="True">
+                                        <Setter TargetName="Unit" Property="BorderBrush" Value="{StaticResource SuccessBrush}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsFree}" Value="False">
+                                        <Setter TargetName="Unit" Property="Background" Value="{StaticResource CreamBrush}" />
+                                        <Setter TargetName="Unit" Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+                                        <Setter TargetName="Dot" Property="Fill" Value="{StaticResource DangerBrush}" />
+                                        <Setter TargetName="Label" Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Chính sách -->
+                    <TextBlock Text="Chính sách lưu trú" Style="{StaticResource SectionTitle}" />
+                    <Border Background="White" BorderBrush="{StaticResource LineBrush}" BorderThickness="1" Padding="28,24">
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="0,0,20,18">
+                                <TextBlock Text="NHẬN / TRẢ PHÒNG" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="Nhận từ 14:00 · Trả trước 12:00" FontSize="15" Foreground="{StaticResource InkBrush}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,18">
+                                <TextBlock Text="HỦY PHÒNG" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="Miễn phí nếu hủy trước 24 giờ" FontSize="15" Foreground="{StaticResource InkBrush}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,0">
+                                <TextBlock Text="GIẤY TỜ" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="CCCD / hộ chiếu khi nhận phòng" FontSize="15" Foreground="{StaticResource InkBrush}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="QUY ĐỊNH CHUNG" Style="{StaticResource FieldLabel}" />
+                                <TextBlock Text="Không hút thuốc · Không mang thú cưng" FontSize="15" Foreground="{StaticResource InkBrush}" />
+                            </StackPanel>
+                        </UniformGrid>
+                    </Border>
+                </StackPanel>
+
+                <!-- ===== CỘT PHẢI: ĐẶT PHÒNG ===== -->
+                <StackPanel Grid.Column="2">
+                    <Border Style="{StaticResource Card}" Padding="30,28">
+                        <StackPanel>
+                            <TextBlock Text="GIÁ MỖI ĐÊM" Style="{StaticResource FieldLabel}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Type.PriceText}" FontFamily="{StaticResource SerifFont}" FontSize="36" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text=" / đêm" Style="{StaticResource Small}" VerticalAlignment="Bottom" Margin="0,0,0,7" />
+                            </StackPanel>
+
+                            <Border x:Name="StatusBadge" HorizontalAlignment="Left" CornerRadius="14" Padding="12,6" Margin="0,14,0,24">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="8" Height="8" VerticalAlignment="Center">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Setter Property="Fill" Value="{StaticResource SuccessBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                        <Setter Property="Fill" Value="{StaticResource DangerBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding StatusText}" FontSize="12" FontWeight="SemiBold" Margin="7,0,0,0">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                        <Setter Property="Foreground" Value="{StaticResource DangerBrush}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="{StaticResource SuccessBgBrush}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                <Setter Property="Background" Value="{StaticResource DangerBgBrush}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <TextBlock Text="NHẬN PHÒNG" Style="{StaticResource FieldLabel}" />
+                            <DatePicker SelectedDate="{Binding CheckIn, Mode=TwoWay}" DisplayDateStart="{Binding Today, Mode=OneWay}" Margin="0,0,0,16" />
+                            <TextBlock Text="TRẢ PHÒNG" Style="{StaticResource FieldLabel}" />
+                            <DatePicker SelectedDate="{Binding CheckOut, Mode=TwoWay}" DisplayDateStart="{Binding MinCheckOut, Mode=OneWay}" Margin="0,0,0,16" />
+                            <TextBlock Text="SỐ KHÁCH" Style="{StaticResource FieldLabel}" />
+                            <ComboBox ItemsSource="{Binding GuestOptions}" SelectedItem="{Binding Guests}" />
+
+                            <Border Background="{StaticResource WarningBgBrush}" Padding="14,10" Margin="0,14,0,0"
+                                    Visibility="{Binding TooManyGuests, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="{Binding GuestWarning}" Style="{StaticResource Small}" Foreground="{StaticResource WarningBrush}" />
+                            </Border>
+
+                            <Border Height="1" Background="{StaticResource LineBrush}" Margin="0,24,0,18" />
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="{Binding NightsText}" Style="{StaticResource Small}" FontSize="14" />
+                                <TextBlock Text="{Binding TotalText}" FontSize="14" Foreground="{StaticResource InkBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <TextBlock Text="Bữa sáng, thuế &amp; phí" Style="{StaticResource Small}" FontSize="14" />
+                                <TextBlock Text="Đã bao gồm" FontSize="14" Foreground="{StaticResource SuccessBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Grid Margin="0,8,0,22">
+                                <TextBlock Text="Tổng cộng" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource InkBrush}" />
+                                <TextBlock Text="{Binding TotalText}" FontFamily="{StaticResource SerifFont}" FontSize="24"
+                                           Foreground="{StaticResource InkBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <Button Content="ĐẶT PHÒNG NGAY" Style="{StaticResource PrimaryButton}" Padding="0,15"
+                                    IsEnabled="{Binding CanBook}" Click="Book_Click" />
+                            <TextBlock Style="{StaticResource Small}" FontSize="12" Margin="0,12,0,0" TextAlignment="Center"
+                                       Text="Chưa thanh toán ngay – thanh toán tại quầy lễ tân." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Background="{StaticResource ForestDarkBrush}" Padding="30,26" Margin="0,24,0,0">
+                        <StackPanel>
+                            <TextBlock Text="CẦN HỖ TRỢ?" Style="{StaticResource Eyebrow}" />
+                            <TextBlock Text="Đặt phòng cho đoàn hoặc hội thảo" FontFamily="{StaticResource SerifFont}" FontSize="22"
+                                       Foreground="White" TextWrapping="Wrap" Margin="0,10,0,12" />
+                            <TextBlock x:Name="HotlineText" Foreground="White" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock x:Name="EmailText" Style="{StaticResource Small}" Foreground="{StaticResource WhiteSoftBrush}" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <!-- ============================ PHÒNG KHÁC ============================ -->
+            <StackPanel Margin="96,90,96,110" MaxWidth="1240">
+                <Grid Margin="0,0,0,36">
+                    <StackPanel>
+                        <TextBlock Text="CÓ THỂ BẠN QUAN TÂM" Style="{StaticResource Eyebrow}" />
+                        <TextBlock Text="Các hạng phòng khác" Style="{StaticResource H2}" Margin="0,12,0,0" />
+                    </StackPanel>
+                    <Button Content="TẤT CẢ PHÒNG  →" Style="{StaticResource OutlineDarkButton}" HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom" Click="Rooms_Click" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding OtherRooms}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="3" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource HoverCard}" Margin="0,0,26,0" fx:Fx.HoverLift="True" MouseLeftButtonUp="OtherRoom_Click">
+                                <StackPanel>
+                                    <Grid Height="230" ClipToBounds="True" Background="{StaticResource SandBrush}">
+                                        <Image Source="{Binding Cover, Converter={StaticResource Img}, ConverterParameter=800}"
+                                               Stretch="UniformToFill" fx:Fx.HoverZoom="1.06" />
+                                    </Grid>
+                                    <StackPanel Margin="24,22">
+                                        <TextBlock Text="{Binding Category}" Style="{StaticResource Eyebrow}" FontSize="11" />
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource H3}" Margin="0,6,0,12" />
+                                        <Grid>
+                                            <TextBlock Text="{Binding ShortGuestsText}" Style="{StaticResource Small}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding PriceText}" FontFamily="{StaticResource SerifFont}" FontSize="20"
+                                                       Foreground="{StaticResource InkBrush}" HorizontalAlignment="Right" />
+                                        </Grid>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
