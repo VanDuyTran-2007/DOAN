@@ -28,7 +28,7 @@
 
     <ScrollViewer x:Name="Scroller" CanContentScroll="False" VerticalScrollBarVisibility="Auto"
                   ScrollChanged="Scroller_ScrollChanged">
-        <StackPanel>
+        <StackPanel RequestBringIntoView="NoAutoScroll">
 
             <!-- ============================ BANNER ============================ -->
             <Grid Height="420" ClipToBounds="True" Background="{StaticResource ForestDarkBrush}">

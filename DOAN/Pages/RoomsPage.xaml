@@ -6,7 +6,7 @@
 
     <ScrollViewer x:Name="Scroller" CanContentScroll="False" VerticalScrollBarVisibility="Auto"
                   ScrollChanged="Scroller_ScrollChanged">
-        <StackPanel>
+        <StackPanel RequestBringIntoView="NoAutoScroll">
 
             <!-- ============================ BANNER ============================ -->
             <Grid Height="380" ClipToBounds="True" Background="{StaticResource ForestDarkBrush}">
@@ -18,7 +18,7 @@
                         <TextBlock Text="  /  Phòng nghỉ" Foreground="{StaticResource BrassBrush}" FontSize="13" />
                     </StackPanel>
                     <TextBlock Text="Phòng nghỉ &amp; Villa" Style="{StaticResource H1}" FontSize="58" />
-                    <TextBlock Text="7 hạng phòng cho mọi nhu cầu – từ chuyến công tác một đêm đến kỳ nghỉ cùng cả gia đình."
+                    <TextBlock Text="6 hạng phòng cho mọi nhu cầu – từ chuyến công tác một đêm đến lưu trú dài hạn cùng gia đình."
                                Style="{StaticResource Body}" Foreground="{StaticResource WhiteSoftBrush}" FontSize="16" Margin="0,12,0,0" />
                 </StackPanel>
             </Grid>

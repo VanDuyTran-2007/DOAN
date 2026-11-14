@@ -23,6 +23,9 @@ namespace DOAN.Pages
             Loaded += (_, _) => Navigator.ReportScroll(Scroller.VerticalOffset);
         }
 
+        // Không cho trang tự cuộn khi một ô nhập (DatePicker...) nhận focus lúc mở trang
+        private void NoAutoScroll(object sender, RequestBringIntoViewEventArgs e) => e.Handled = true;
+
         private void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
             => Navigator.ReportScroll(e.VerticalOffset);
 

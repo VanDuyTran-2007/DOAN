@@ -27,6 +27,7 @@ namespace DOAN
             {
                 if (args[i + 1] == "rooms") Navigator.GoRooms();
                 else if (VillaData.Find(args[i + 1]) is { } room) Navigator.GoDetail(room);
+                else MainFrame.Navigate(new HomePage(args[i + 1])); // about | amenities | gallery | contact
             }
         }
 

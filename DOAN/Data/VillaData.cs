@@ -7,53 +7,71 @@ public record Feature(string Url, string Title, string Text);
 public record Service(string Glyph, string Title, string Text);
 
 /// <summary>
-/// Dữ liệu mẫu cho phần giao diện (front end).
+/// Dữ liệu mẫu cho phần giao diện (front end), lấy cảm hứng từ Nhà khách ĐHQG-HCM.
 /// Khi có cơ sở dữ liệu, chỉ cần thay lớp này bằng lớp đọc từ DB.
-/// Ảnh đang dùng URL Unsplash; có thể thay bằng ảnh trong project, ví dụ "Images/villa1.jpg"
+/// Ảnh có thể là URL (http...) hoặc ảnh trong project, ví dụ "Images/phong1.jpg"
 /// (đặt Build Action của ảnh là Resource).
 /// </summary>
 public static class VillaData
 {
+    // ---------------------------------------------------------------- ẢNH
+    // Ảnh thật của Nhà khách ĐHQG-HCM (nguồn: ipsc.edu.vn, httt.uit.edu.vn) — chỉ dùng cho mục đích học tập.
+    private const string Ipsc = "https://ipsc.edu.vn/wp-content/uploads/";
+    private const string Uit = "https://httt.uit.edu.vn/wp-content/uploads/2025/01/";
+
+    public const string ImgDrone = Ipsc + "2025/11/DJI_20251111091405_0148_D-mp4-image.jpg";
+    public const string ImgGrounds = Ipsc + "2025/11/DSC00042-scaled.jpg";
+    public const string ImgBuilding = Ipsc + "2025/11/DSC00075-scaled.jpg";
+    public const string ImgFeatured = Ipsc + "2025/11/anh-ok-scaled.jpg";
+    public const string ImgRoom = Ipsc + "2025/11/IMG_9730-scaled.jpg";
+    public const string ImgPool = Ipsc + "2025/11/DSC00032-scaled.jpg";
+    public const string ImgBike = Ipsc + "2025/11/image-534.png";
+    public const string ImgBus = Ipsc + "2025/12/XeBuyt1-scaled.jpg";
+    public const string ImgCanteen = Ipsc + "2025/12/DSC00091-scaled.jpg";
+    public const string ImgGym = Ipsc + "2025/12/DSC00006-scaled.jpg";
+    public const string ImgLaundry = Ipsc + "2025/12/DSC00086-scaled.jpg";
+    public const string ImgPoolIndoor = Uit + "472311792_893796319632936_171930630132811191_n-1024x768.jpg";
+    public const string ImgRoomFurniture = Uit + "352358250_280252214484953_3888933479688751904_n-769x1024.jpg";
+    public const string ImgRoomStudent = Uit + "454539026_793321989680370_1635796597195461278_n-950x1024.jpg";
+
+    // Ảnh minh họa bổ sung (Unsplash) cho những góc chưa có ảnh thật: phòng tắm, villa
     private static string U(string id, int w = 1400) =>
         $"https://images.unsplash.com/photo-{id}?fm=jpg&fit=crop&w={w}&q=80";
 
-    public const string Hotline = "028 3724 2160";
-    public const string Email = "datphong@villadhqg.edu.vn";
-    public const string Address = "Khu đô thị ĐHQG-HCM, P. Linh Trung, TP. Thủ Đức, TP. Hồ Chí Minh";
+    // ---------------------------------------------------------------- LIÊN HỆ
+    public const string Hotline = "(028) 3724 4222";
+    public const string Email = "ipsc@vnuhcm.edu.vn";
+    public const string Address = "Đường Nguyễn Du, Khu đô thị ĐHQG-HCM, KP. Tân Hòa, P. Đông Hòa, TP. Hồ Chí Minh";
 
-    public static IReadOnlyList<string> HeroImages { get; } =
-    [
-        U("1566073771259-6a8506099945", 1920),
-        U("1613490493576-7fde63acd811", 1920),
-        U("1470071459604-3b5ec3a7fe05", 1920),
-    ];
+    // ---------------------------------------------------------------- TRANG CHỦ
+    public static IReadOnlyList<string> HeroImages { get; } = [ImgDrone, ImgGrounds, ImgFeatured];
 
     public static IReadOnlyList<GalleryItem> Gallery { get; } =
     [
-        new(U("1571896349842-33c89424de2d"), "Hồ bơi ngoài trời"),
-        new(U("1582719478250-c89cae4dc85b"), "Phòng Deluxe"),
-        new(U("1414235077428-338989a2e8c0"), "Nhà hàng Hoa Sứ"),
-        new(U("1441974231531-c6227db76b6e"), "Đường dạo trong rừng"),
-        new(U("1600585154340-be6161a56a0c"), "Villa sân vườn"),
-        new(U("1544161515-4ab6ce6db874"), "Spa & thư giãn"),
+        new(ImgBuilding, "Tòa nhà khách ĐHQG"),
+        new(ImgRoom, "Phòng lưu trú"),
+        new(ImgPool, "Hồ bơi tiêu chuẩn"),
+        new(ImgBike, "Xe đạp công cộng"),
+        new(ImgGrounds, "Khuôn viên nhà khách"),
+        new(ImgLaundry, "Dịch vụ giặt sấy"),
     ];
 
     public static IReadOnlyList<Feature> Features { get; } =
     [
-        new(U("1517248135467-4c7edcad34c4", 900), "NHÀ HÀNG", "Ẩm thực Việt và buffet sáng mỗi ngày từ 6:00."),
-        new(U("1520250497591-112f2f40a3f4", 900), "HỒ BƠI", "Hồ bơi ngoài trời giữa khuôn viên xanh."),
-        new(U("1517502884422-41eaead166d4", 900), "HỘI THẢO", "Phòng hội nghị 30 – 200 chỗ cho sự kiện học thuật."),
-        new(U("1585320806297-9794b3e4eeae", 900), "KHUÔN VIÊN", "Hơn 2 ha cây xanh, đường dạo bộ và hồ cảnh quan."),
+        new(ImgCanteen, "CANTEEN – CAFÉ", "Canteen và quán cà phê ngay cạnh nhà khách, giá phù hợp sinh viên."),
+        new(ImgPoolIndoor, "HỒ BƠI", "Hồ bơi có mái che, mở cửa 6:00 – 11:00 và 14:00 – 20:00."),
+        new(ImgGym, "PHÒNG GYM", "Phòng tập dành cho khách lưu trú sử dụng hằng ngày."),
+        new(ImgBus, "XE BUÝT NỘI KHU", "Trạm xe buýt nội khu kết nối các trường thành viên."),
     ];
 
     public static IReadOnlyList<Service> Services { get; } =
     [
-        new("", "Wi-Fi miễn phí", "Tốc độ cao toàn khu"),
-        new("", "Bãi đỗ xe", "Ô tô & xe máy"),
+        new("", "Wi-Fi miễn phí", "Tốc độ cao 24/24"),
+        new("", "Xe buýt nội khu", "Trạm ngay cạnh nhà khách"),
+        new("", "Bãi đỗ xe", "Có bảo vệ trông giữ"),
         new("", "Lễ tân 24/7", "Hỗ trợ mọi lúc"),
-        new("", "Gần các trường", "Đi bộ tới ĐH thành viên"),
-        new("", "Đón đoàn", "Ưu đãi cho đoàn khách"),
-        new("", "Đặt linh hoạt", "Hủy miễn phí trước 24h"),
+        new("", "Gần các trường", "0,5 – 2,5 km"),
+        new("", "Lưu trú dài hạn", "Ưu đãi từ 1 tháng"),
     ];
 
     public static IReadOnlyList<RoomType> RoomTypes { get; } = BuildRooms();
@@ -61,122 +79,121 @@ public static class VillaData
     public static RoomType? Find(string id) => RoomTypes.FirstOrDefault(r => r.Id == id);
 
     // --------------------------------------------------------------------
+    // Hạng phòng & giá theo thông tin công bố của Nhà khách ĐHQG-HCM (ipsc.edu.vn).
+    // Diện tích và danh sách tiện nghi chi tiết là số liệu giả định cho đồ án.
+    private static string[] BathroomImg => [U("1552321554-5fefe8c9ef14"), U("1584622650111-993a426fbf0a")];
+
     private static List<RoomType> BuildRooms()
     {
         var list = new List<RoomType>
         {
             new()
             {
-                Id = "std-single", Name = "Phòng Tiêu chuẩn Đơn", Category = "STANDARD",
-                ShortDescription = "Gọn gàng, yên tĩnh – lựa chọn lý tưởng cho giảng viên, nghiên cứu sinh đi công tác.",
-                Description = "Phòng Tiêu chuẩn Đơn được thiết kế tối giản với tông gỗ ấm, bàn làm việc rộng và cửa sổ nhìn ra vườn cây. " +
-                              "Không gian nhỏ gọn nhưng đầy đủ tiện nghi, phù hợp cho khách lưu trú ngắn ngày hoặc đến tham dự hội thảo tại ĐHQG.",
-                Price = 450_000, Area = 20, Beds = 1, BedType = "Giường đơn 1m2", MaxAdults = 1, MaxChildren = 0,
-                View = "Hướng vườn",
-                Images = [U("1631049307264-da0ec9d70304"), U("1595576508898-0ad5c879a061"), U("1584622650111-993a426fbf0a"), U("1505693416388-ac5ce068fe85")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn làm việc", "TV 32\"", "Nước nóng", "Tủ quần áo", "Ấm đun nước", "Dép & khăn tắm"],
+                Id = "double", Name = "Phòng 1 Giường Đôi", Category = "DOUBLE ROOM", Highlight = "Giá tốt",
+                ShortDescription = "Một giường đôi rộng rãi cho 2 khách – lựa chọn tiết kiệm cho cặp đôi hoặc khách công tác.",
+                Description = "Phòng Double được trang bị một giường đôi, bàn học – làm việc, đèn bàn, tủ quần áo và phòng tắm riêng có nước nóng. " +
+                              "Toàn bộ phòng có điều hòa và Wi-Fi tốc độ cao, phù hợp cho giảng viên, khách mời đến tham dự hội thảo hoặc phụ huynh đến thăm sinh viên.",
+                Price = 400_000, Area = 20, Beds = 1, BedType = "1 giường đôi", MaxAdults = 2, MaxChildren = 0,
+                View = "Hướng khuôn viên",
+                Images = [ImgRoomFurniture, ImgRoom, BathroomImg[0], ImgGrounds],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn học & đèn bàn", "TV", "Tủ lạnh", "Nước nóng", "Tủ quần áo", "Dọn phòng hằng ngày"],
             },
             new()
             {
-                Id = "std-twin", Name = "Phòng Tiêu chuẩn Đôi", Category = "STANDARD", Highlight = "Phổ biến",
-                ShortDescription = "Hai giường đơn tiện lợi cho đồng nghiệp hoặc bạn bè cùng đi công tác, học tập.",
-                Description = "Phòng có hai giường đơn tách biệt, bàn làm việc chung và khu vực tủ đồ rộng. " +
+                Id = "twin", Name = "Phòng 2 Giường Đơn", Category = "TWIN ROOM", Highlight = "Phổ biến",
+                ShortDescription = "Hai giường đơn tách biệt – tiện cho đồng nghiệp, bạn bè cùng đi công tác hoặc học tập.",
+                Description = "Phòng Twin gồm hai giường đơn, bàn ghế học tập, tủ lạnh, TV và phòng tắm có bồn tắm, vòi sen, máy nước nóng. " +
                               "Đây là hạng phòng được các đoàn giảng viên, sinh viên trao đổi lựa chọn nhiều nhất nhờ mức giá hợp lý.",
-                Price = 550_000, Area = 26, Beds = 2, BedType = "2 giường đơn 1m2", MaxAdults = 2, MaxChildren = 0,
-                View = "Hướng vườn",
-                Images = [U("1590490360182-c33d57733427"), U("1596394516093-501ba68a0ba6"), U("1552321554-5fefe8c9ef14"), U("1522771739844-6a9f6d5f14af")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn làm việc", "TV 40\"", "Tủ lạnh mini", "Nước nóng", "Ấm đun nước", "Két an toàn"],
+                Price = 500_000, Area = 22, Beds = 2, BedType = "2 giường đơn", MaxAdults = 2, MaxChildren = 0,
+                View = "Hướng khuôn viên",
+                Images = [ImgRoom, ImgRoomFurniture, BathroomImg[1], ImgBuilding],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn ghế học tập", "TV", "Tủ lạnh", "Bồn tắm & vòi sen", "Tủ quần áo", "Dọn phòng hằng ngày"],
             },
             new()
             {
-                Id = "deluxe", Name = "Phòng Deluxe Hướng Hồ", Category = "DELUXE",
-                ShortDescription = "Giường đôi lớn, ban công riêng nhìn ra hồ cảnh quan – yên bình như một kỳ nghỉ.",
-                Description = "Phòng Deluxe sở hữu ban công riêng hướng thẳng ra hồ cảnh quan trong khuôn viên. " +
-                              "Nội thất gỗ sồi, chăn ga cotton cao cấp, bồn tắm đứng kính và góc thư giãn cạnh cửa sổ lớn mang lại cảm giác như đang ở một resort.",
-                Price = 750_000, Area = 32, Beds = 1, BedType = "Giường đôi 1m8", MaxAdults = 2, MaxChildren = 1,
-                View = "Hướng hồ, có ban công",
-                Images = [U("1582719478250-c89cae4dc85b"), U("1611892440504-42a792e24d32"), U("1584132967334-10e028bd69f7"), U("1552321554-5fefe8c9ef14")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Ban công riêng", "Smart TV 43\"", "Tủ lạnh mini", "Máy sấy tóc", "Két an toàn", "Ấm đun nước", "Bữa sáng"],
+                Id = "quad", Name = "Phòng 2 Giường Đôi", Category = "QUAD ROOM",
+                ShortDescription = "Hai giường đôi cho 4 khách – thoải mái cho nhóm bạn hoặc gia đình nhỏ.",
+                Description = "Phòng Quad có hai giường đôi, không gian rộng hơn với khu bàn ghế sinh hoạt chung. " +
+                              "Phù hợp cho nhóm sinh viên tham dự cuộc thi, hội thảo hoặc gia đình đưa con đi nhập học tại Làng Đại học.",
+                Price = 500_000, Area = 28, Beds = 2, BedType = "2 giường đôi", MaxAdults = 4, MaxChildren = 0,
+                View = "Hướng khuôn viên",
+                Images = [ImgRoomStudent, ImgRoom, BathroomImg[0], ImgPool],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn ghế sinh hoạt", "TV", "Tủ lạnh", "Nước nóng", "Tủ quần áo", "Dọn phòng hằng ngày"],
             },
             new()
             {
-                Id = "family", Name = "Phòng Gia đình", Category = "FAMILY",
-                ShortDescription = "Hai giường đôi và góc sinh hoạt chung – rộng rãi cho gia đình có con nhỏ.",
-                Description = "Phòng Gia đình rộng 44 m² với hai giường đôi, sofa và bàn ăn nhỏ. " +
-                              "Phù hợp cho phụ huynh đưa con đi thi, nhập học hoặc gia đình về thăm sinh viên. Có thể kê thêm nôi em bé theo yêu cầu.",
-                Price = 1_150_000, Area = 44, Beds = 2, BedType = "2 giường đôi 1m6", MaxAdults = 4, MaxChildren = 2,
-                View = "Hướng vườn",
-                Images = [U("1618773928121-c32242e63f39"), U("1560448204-e02f11c3d0e2"), U("1540518614846-7eded433c457"), U("1584622650111-993a426fbf0a")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Sofa", "Smart TV 50\"", "Tủ lạnh", "Bàn ăn nhỏ", "Nôi em bé (theo yêu cầu)", "Máy sấy tóc", "Bữa sáng"],
+                Id = "triple", Name = "Phòng 3 Giường Đôi", Category = "TRIPLE ROOM",
+                ShortDescription = "Ba giường đôi, sức chứa đến 6 khách – lý tưởng cho đoàn học sinh, sinh viên.",
+                Description = "Phòng Triple với ba giường đôi là lựa chọn kinh tế cho các đoàn đông người. " +
+                              "Khách lưu trú được sử dụng hồ bơi, phòng gym, xe đạp công cộng và trạm xe buýt nội khu ngay cạnh nhà khách.",
+                Price = 700_000, Area = 34, Beds = 3, BedType = "3 giường đôi", MaxAdults = 6, MaxChildren = 0,
+                View = "Hướng khuôn viên",
+                Images = [ImgRoom, ImgRoomStudent, BathroomImg[1], ImgBike],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bàn ghế học tập", "TV", "Tủ lạnh", "Nước nóng", "Tủ đồ cá nhân", "Dọn phòng hằng ngày"],
             },
             new()
             {
-                Id = "suite", Name = "Junior Suite Rừng Thông", Category = "SUITE", Highlight = "Cao cấp",
-                ShortDescription = "Phòng ngủ và phòng khách riêng biệt, cửa kính lớn ôm trọn hàng cây xanh.",
-                Description = "Junior Suite nằm ở tầng cao nhất với phòng khách riêng, bàn làm việc gỗ nguyên khối và bồn tắm nằm. " +
-                              "Hạng phòng dành cho chuyên gia, khách mời quốc tế và những ai muốn một không gian riêng tư, sang trọng.",
-                Price = 1_450_000, Area = 50, Beds = 1, BedType = "Giường King 2m", MaxAdults = 2, MaxChildren = 1,
-                View = "Hướng rừng cây, tầng cao",
-                Images = [U("1616594039964-ae9021a400a0"), U("1600210492486-724fe5c67fb0"), U("1560185007-cde436f6a4d0"), U("1552321554-5fefe8c9ef14")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Phòng khách riêng", "Bồn tắm nằm", "Smart TV 55\"", "Máy pha cà phê", "Minibar", "Áo choàng tắm", "Bữa sáng"],
+                Id = "family", Name = "Phòng Gia Đình", Category = "FAMILY ROOM",
+                ShortDescription = "Hai giường đôi và một giường đơn cho 5 khách – rộng rãi cho gia đình về thăm sinh viên.",
+                Description = "Phòng Gia đình gồm hai giường đôi và một giường đơn, khu sinh hoạt chung và tủ lạnh lớn. " +
+                              "Phù hợp cho phụ huynh đưa con đi thi, nhập học hoặc gia đình nhiều thế hệ về thăm con em đang học tại ĐHQG-HCM.",
+                Price = 600_000, Area = 32, Beds = 3, BedType = "2 giường đôi + 1 giường đơn", MaxAdults = 4, MaxChildren = 1,
+                View = "Hướng khuôn viên",
+                Images = [ImgRoomFurniture, ImgRoomStudent, BathroomImg[0], ImgCanteen],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Khu sinh hoạt chung", "TV", "Tủ lạnh", "Bồn tắm & vòi sen", "Tủ quần áo", "Dọn phòng hằng ngày"],
             },
             new()
             {
                 Id = "villa", Name = "Villa Sân Vườn Nguyên Căn", Category = "VILLA", Highlight = "Riêng tư",
-                ShortDescription = "Căn villa 3 phòng ngủ có sân vườn và bếp riêng – trọn vẹn cho nhóm hoặc đại gia đình.",
-                Description = "Villa nguyên căn hai tầng gồm 3 phòng ngủ, phòng khách, bếp đầy đủ dụng cụ và sân vườn BBQ riêng. " +
-                              "Thích hợp cho đoàn chuyên gia lưu trú dài ngày, gia đình nhiều thế hệ hoặc nhóm bạn tổ chức tiệc nhỏ.",
-                Price = 3_900_000, Area = 120, Beds = 4, BedType = "2 giường King + 2 giường đơn", MaxAdults = 8, MaxChildren = 2,
+                ShortDescription = "Căn villa 3 phòng ngủ có sân vườn và bếp riêng – trọn vẹn cho đoàn chuyên gia hoặc đại gia đình.",
+                Description = "Villa nguyên căn hai tầng gồm 3 phòng ngủ, phòng khách, bếp đầy đủ dụng cụ và sân vườn riêng. " +
+                              "Hạng phòng mở rộng của đồ án, dành cho đoàn chuyên gia lưu trú dài ngày hoặc khách mời quốc tế.",
+                Price = 3_500_000, Area = 120, Beds = 4, BedType = "2 giường King + 2 giường đơn", MaxAdults = 8, MaxChildren = 2,
                 View = "Sân vườn riêng",
-                Images = [U("1600585154340-be6161a56a0c"), U("1580587771525-78b9dba3b914"), U("1600210492486-724fe5c67fb0"), U("1564013799919-ab600027ffc6")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bếp riêng", "Sân vườn BBQ", "Máy giặt", "Phòng khách", "Smart TV 65\"", "Chỗ đỗ ô tô riêng", "Bữa sáng"],
-            },
-            new()
-            {
-                Id = "group", Name = "Phòng Đoàn Sinh viên", Category = "GROUP",
-                ShortDescription = "Giường tầng tiện lợi cho đoàn sinh viên tham dự hội thảo, cuộc thi, giao lưu.",
-                Description = "Phòng tập thể với 4 giường tầng (8 chỗ), tủ khóa cá nhân cho từng khách và phòng tắm rộng. " +
-                              "Giá ưu đãi dành cho đoàn sinh viên, học sinh đến tham dự các sự kiện tại Làng Đại học.",
-                Price = 1_200_000, Area = 40, Beds = 4, BedType = "4 giường tầng", MaxAdults = 8, MaxChildren = 0,
-                View = "Hướng sân trong",
-                Images = [U("1596394516093-501ba68a0ba6"), U("1540518614846-7eded433c457"), U("1584622650111-993a426fbf0a"), U("1562774053-701939374585")],
-                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Tủ khóa cá nhân", "Nước nóng", "Bàn học chung", "Quạt trần"],
+                Images = [U("1600585154340-be6161a56a0c"), U("1580587771525-78b9dba3b914"), U("1600210492486-724fe5c67fb0"), ImgGrounds],
+                Amenities = ["Wi-Fi miễn phí", "Điều hòa", "Bếp riêng", "Sân vườn", "Máy giặt", "Phòng khách", "Smart TV", "Chỗ đỗ ô tô riêng"],
             },
         };
 
-        // Tạo danh sách phòng + lịch đặt mẫu (cố định nhờ seed)
-        var plan = new (string Id, string Prefix, int Count, double Occupancy)[]
+        // Tổng cộng 74 phòng (6 tầng) giống Nhà khách ĐHQG-HCM
+        var plan = new (string Id, int Count, double Occupancy)[]
         {
-            ("std-single", "1", 8, 0.45),
-            ("std-twin",   "2", 10, 0.55),
-            ("deluxe",     "3", 6, 0.6),
-            ("family",     "4", 4, 0.5),
-            ("suite",      "5", 3, 0.5),
-            ("villa",      "V", 2, 0.65),
-            ("group",      "6", 3, 0.4),
+            ("double", 20, 0.5),
+            ("twin",   20, 0.55),
+            ("quad",   14, 0.5),
+            ("triple", 10, 0.45),
+            ("family",  8, 0.5),
+            ("villa",   2, 0.65),
         };
 
         var today = DateTime.Today;
-        foreach (var (id, prefix, count, occ) in plan)
+        int roomNo = 0;
+        foreach (var (id, count, occ) in plan)
         {
             var type = list.First(t => t.Id == id);
             for (int i = 1; i <= count; i++)
             {
                 // string.GetHashCode khác nhau giữa các lần chạy -> dùng seed ổn định
                 var rnd = new Random(StableSeed(id) + i * 7919);
-
-                var room = new Room
+                Room room;
+                if (id == "villa")
                 {
-                    Number = prefix == "V" ? $"Villa {i:00}" : $"P.{prefix}{i:00}",
-                    Floor = prefix == "V" ? 1 : int.Parse(prefix),
-                    Bookings = GenerateBookings(rnd, occ, today),
-                };
+                    room = new Room { Number = $"Villa {i:00}", Floor = 0 };
+                }
+                else
+                {
+                    // Phân bổ 72 phòng lên 6 tầng, mỗi tầng 12 phòng: 101..112, 201..212, ...
+                    int floor = roomNo / 12 + 1;
+                    room = new Room { Number = $"P.{floor}{roomNo % 12 + 1:00}", Floor = floor };
+                    roomNo++;
+                }
+                room.Bookings.AddRange(GenerateBookings(rnd, occ, today));
                 type.Rooms.Add(room);
             }
         }
 
-        // Cố ý cho Junior Suite hết phòng vài ngày tới để minh họa trạng thái "Hết phòng"
-        foreach (var r in list.First(t => t.Id == "suite").Rooms)
+        // Cố ý cho Villa hết phòng vài ngày tới để minh họa trạng thái "Hết phòng"
+        foreach (var r in list.First(t => t.Id == "villa").Rooms)
         {
             r.Bookings.RemoveAll(b => b.From < today.AddDays(4) && today.AddDays(-1) < b.To);
             r.Bookings.Add(new Booking(today.AddDays(-1), today.AddDays(4)));

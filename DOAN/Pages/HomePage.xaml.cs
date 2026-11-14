@@ -24,7 +24,7 @@ namespace DOAN.Pages
         public IReadOnlyList<GalleryItem> Gallery => VillaData.Gallery;
         public IReadOnlyList<Feature> Features => VillaData.Features;
         public IReadOnlyList<Service> Services => VillaData.Services;
-        public IEnumerable<RoomType> FeaturedRooms => VillaData.RoomTypes.Where(r => r.Id is "deluxe" or "family" or "villa");
+        public IEnumerable<RoomType> FeaturedRooms => VillaData.RoomTypes.Where(r => r.Id is "twin" or "family" or "triple");
 
         public HomePage(string? section = null)
         {
@@ -94,6 +94,9 @@ namespace DOAN.Pages
         private void RestartTimer() { _slideTimer.Stop(); _slideTimer.Start(); }
 
         // ------------------------- Cuộn trang -------------------------
+        // Không cho trang tự cuộn khi một ô nhập (DatePicker...) nhận focus lúc mở trang
+        private void NoAutoScroll(object sender, RequestBringIntoViewEventArgs e) => e.Handled = true;
+
         private void Scroller_ScrollChanged(object sender, ScrollChangedEventArgs e)
             => Navigator.ReportScroll(e.VerticalOffset);
 

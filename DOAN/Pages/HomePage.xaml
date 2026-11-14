@@ -6,7 +6,7 @@
 
     <ScrollViewer x:Name="Scroller" CanContentScroll="False" VerticalScrollBarVisibility="Auto"
                   ScrollChanged="Scroller_ScrollChanged">
-        <StackPanel x:Name="Root">
+        <StackPanel x:Name="Root" RequestBringIntoView="NoAutoScroll">
 
             <!-- ============================ HERO ============================ -->
             <Grid x:Name="Hero" MinHeight="700" ClipToBounds="True"
@@ -89,20 +89,20 @@
                     <TextBlock Style="{StaticResource Body}" Margin="0,0,0,16"
                                Text="Lấy cảm hứng từ Nhà khách Đại học Quốc gia TP.HCM, Villa ĐHQG là điểm lưu trú nằm giữa khu đô thị đại học rộng lớn ở Thủ Đức – nơi những hàng cây dầu, hồ nước và các giảng đường hòa vào nhau." />
                     <TextBlock Style="{StaticResource Body}"
-                               Text="Chúng tôi phục vụ khách tham dự hội thảo, chuyên gia quốc tế, đoàn sinh viên và phụ huynh với hệ thống phòng đa dạng: từ phòng tiêu chuẩn tiện nghi, phòng gia đình rộng rãi đến villa sân vườn nguyên căn." />
+                               Text="Tòa nhà 6 tầng với 74 phòng, đón hơn 170 khách mỗi đêm: giảng viên, chuyên gia, đoàn sinh viên và phụ huynh. Phòng đa dạng từ phòng đôi, phòng gia đình đến lưu trú dài hạn, đều có điều hòa và Wi-Fi tốc độ cao." />
 
                     <UniformGrid Columns="3" Margin="0,40,0,40">
                         <StackPanel>
                             <TextBlock x:Name="StatRooms" Text="36" FontFamily="{StaticResource SerifFont}" FontSize="44" Foreground="{StaticResource ForestBrush}" />
-                            <TextBlock Text="Phòng &amp; villa" Style="{StaticResource Small}" />
+                            <TextBlock Text="Phòng lưu trú, 6 tầng" Style="{StaticResource Small}" />
                         </StackPanel>
                         <StackPanel>
                             <TextBlock x:Name="StatTypes" Text="7" FontFamily="{StaticResource SerifFont}" FontSize="44" Foreground="{StaticResource ForestBrush}" />
                             <TextBlock Text="Hạng phòng" Style="{StaticResource Small}" />
                         </StackPanel>
                         <StackPanel>
-                            <TextBlock Text="2 ha" FontFamily="{StaticResource SerifFont}" FontSize="44" Foreground="{StaticResource ForestBrush}" />
-                            <TextBlock Text="Khuôn viên xanh" Style="{StaticResource Small}" />
+                            <TextBlock Text="170+" FontFamily="{StaticResource SerifFont}" FontSize="44" Foreground="{StaticResource ForestBrush}" />
+                            <TextBlock Text="Khách mỗi đêm" Style="{StaticResource Small}" />
                         </StackPanel>
                     </UniformGrid>
 
@@ -125,7 +125,7 @@
                     <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Background="{StaticResource ForestBrush}"
                             Padding="26,20" Margin="-30,0,0,30">
                         <StackPanel>
-                            <TextBlock Text="Từ 450.000 đ" FontFamily="{StaticResource SerifFont}" FontSize="26" Foreground="White" />
+                            <TextBlock Text="Từ 400.000 đ" FontFamily="{StaticResource SerifFont}" FontSize="26" Foreground="White" />
                             <TextBlock Text="mỗi đêm, đã gồm thuế phí" Style="{StaticResource Small}" Foreground="{StaticResource WhiteSoftBrush}" />
                         </StackPanel>
                     </Border>
@@ -140,7 +140,7 @@
                             <TextBlock Text="TIỆN ÍCH &amp; DỊCH VỤ" Style="{StaticResource Eyebrow}" />
                             <TextBlock Text="Mọi thứ cho một kỳ lưu trú trọn vẹn" Style="{StaticResource H2}" Foreground="White" Margin="0,14,0,0" />
                         </StackPanel>
-                        <TextBlock Text="Từ bữa sáng bên hồ đến phòng hội thảo cho 200 khách – chúng tôi chuẩn bị chu đáo để bạn chỉ cần tận hưởng."
+                        <TextBlock Text="Hồ bơi, phòng gym, canteen, xe đạp công cộng và xe buýt nội khu – tất cả nằm ngay trong hệ sinh thái Khu đô thị ĐHQG-HCM."
                                    Style="{StaticResource Body}" Foreground="{StaticResource WhiteSoftBrush}" MaxWidth="400"
                                    HorizontalAlignment="Right" VerticalAlignment="Bottom" />
                     </Grid>
