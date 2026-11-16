@@ -1,3 +1,11 @@
 <Solution>
-  <Project Path="DOAN/DOAN.csproj" />
+  <Folder Name="/Apps/">
+    <Project Path="../VILLA_DHQG/VILLA_DHQG.csproj" />
+    <Project Path="../CINEMA_CENTER/CINEMA_CENTER.csproj" />
+  </Folder>
+  <Folder Name="/Tai lieu/">
+    <File Path="../README.md" />
+    <File Path="../agent.md" />
+    <File Path="../.gitignore" />
+  </Folder>
 </Solution>
