@@ -1,0 +1,41 @@
+<UserControl x:Class="CineBook.Controls.DateStrip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Thanh chọn ngày (7 ngày). ItemsSource = ObservableCollection<DateOption> -->
+    <UserControl.Resources>
+        <Style x:Key="DateChip" TargetType="RadioButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Bd" Width="78" Padding="0,9" CornerRadius="8" BorderThickness="1" BorderBrush="{StaticResource NavyBorder}" Background="{StaticResource NavySurface}">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock x:Name="Day" Text="{Binding DayText}" Style="{StaticResource TextCaption}" HorizontalAlignment="Center" />
+                                <TextBlock x:Name="Date" Text="{Binding DateText}" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMuted}" /></Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource Burgundy}" />
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BurgundyHover}" />
+                                <Setter TargetName="Day" Property="Foreground" Value="{StaticResource TextPrimary}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <ItemsControl ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <RadioButton Style="{StaticResource DateChip}" GroupName="DateStripGroup" IsChecked="{Binding IsSelected, Mode=TwoWay}" />
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

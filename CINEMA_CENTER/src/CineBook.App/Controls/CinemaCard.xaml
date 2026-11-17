@@ -1,0 +1,27 @@
+<UserControl x:Class="CineBook.Controls.CinemaCard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root" Width="300" Margin="0,0,16,16">
+    <!-- DataContext = Cinema -->
+    <Border Style="{StaticResource CardBorder}" Padding="16">
+        <StackPanel>
+            <Grid>
+                <!-- Badge brand: màu theo hãng -->
+                <Border HorizontalAlignment="Left" Padding="10,3" CornerRadius="999" Background="{Binding Brand.ThemeColorHex, Converter={StaticResource HexToBrush}}">
+                    <TextBlock Text="{Binding Brand.Name}" FontSize="11" FontWeight="Bold" />
+                </Border>
+                <TextBlock Text="{Binding DistanceText}" HorizontalAlignment="Right" Foreground="{StaticResource AccentGold}" FontWeight="SemiBold" />
+            </Grid>
+            <TextBlock Text="{Binding Name}" Style="{StaticResource TextH3}" Margin="0,12,0,4" TextTrimming="CharacterEllipsis" />
+            <StackPanel Orientation="Horizontal">
+                <Path Data="{StaticResource IconLocation}" Fill="{StaticResource TextMuted}" Width="14" Height="14" Stretch="Uniform" Margin="0,2,6,0" VerticalAlignment="Top" />
+                <TextBlock Text="{Binding Address}" Style="{StaticResource TextCaption}" TextWrapping="Wrap" MaxWidth="240" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource TextCaption}" Margin="20,2,0,0">
+                <Run Text="{Binding District, Mode=OneWay}" /><Run Text=" · " /><Run Text="{Binding City, Mode=OneWay}" />
+            </TextBlock>
+            <Button Content="Xem lịch chiếu" Style="{StaticResource SecondaryButton}" Margin="0,14,0,0" Padding="14,8"
+                    Command="{Binding OpenCommand, ElementName=Root}" CommandParameter="{Binding}" />
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,38 @@
+<UserControl x:Class="CineBook.Controls.BookingStepper"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Thanh tiến trình: ① Chọn suất → ② Chọn ghế → ③ Bắp nước → ④ Thanh toán → ⑤ Hoàn tất. DataContext = BookingViewModel -->
+    <ItemsControl ItemsSource="{Binding Steps}" HorizontalAlignment="Center">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                    <!-- Đường nối (không có ở bước đầu) -->
+                    <Border x:Name="Line" Width="56" Height="2" Margin="10,0" Background="{StaticResource NavyBorder}" VerticalAlignment="Center" />
+                    <Grid>
+                        <Ellipse x:Name="Circle" Width="30" Height="30" Fill="{StaticResource NavySurface}" Stroke="{StaticResource NavyBorder}" StrokeThickness="1.5" />
+                        <TextBlock x:Name="Num" Text="{Binding Number}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" />
+                    </Grid>
+                    <TextBlock x:Name="Title" Text="{Binding Title}" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextMuted}" FontWeight="SemiBold" />
+                </StackPanel>
+                <DataTemplate.Triggers>
+                    <DataTrigger Binding="{Binding Number}" Value="1"><Setter TargetName="Line" Property="Visibility" Value="Collapsed" /></DataTrigger>
+                    <DataTrigger Binding="{Binding IsDone}" Value="True">
+                        <Setter TargetName="Circle" Property="Fill" Value="{StaticResource BurgundyDark}" />
+                        <Setter TargetName="Circle" Property="Stroke" Value="{StaticResource Burgundy}" />
+                        <Setter TargetName="Num" Property="Foreground" Value="{StaticResource TextPrimary}" />
+                        <Setter TargetName="Title" Property="Foreground" Value="{StaticResource TextSecondary}" />
+                        <Setter TargetName="Line" Property="Background" Value="{StaticResource Burgundy}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                        <Setter TargetName="Circle" Property="Fill" Value="{StaticResource Burgundy}" />
+                        <Setter TargetName="Circle" Property="Stroke" Value="{StaticResource BurgundyHover}" />
+                        <Setter TargetName="Num" Property="Foreground" Value="{StaticResource TextPrimary}" />
+                        <Setter TargetName="Title" Property="Foreground" Value="{StaticResource TextPrimary}" />
+                        <Setter TargetName="Line" Property="Background" Value="{StaticResource Burgundy}" />
+                    </DataTrigger>
+                </DataTemplate.Triggers>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>
