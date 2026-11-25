@@ -1,0 +1,87 @@
+<UserControl x:Class="CineBook.Views.BookingView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:CineBook.Controls">
+    <!-- DataContext = BookingViewModel: wizard 5 bước -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Lỗi tải suất chiếu -->
+        <StackPanel Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="{Binding LoadError, Converter={StaticResource NullToCollapsed}}">
+            <TextBlock Text="Không mở được suất chiếu" Style="{StaticResource TextH2}" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding LoadError}" Style="{StaticResource TextError}" HorizontalAlignment="Center" Margin="0,6,0,14" />
+            <Button Content="Quay lại" Style="{StaticResource PrimaryButton}" Command="{Binding CloseToMovieCommand}" HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Thanh tiến trình -->
+        <Border Grid.Row="0" Padding="0,18" BorderBrush="{StaticResource NavyBorder}" BorderThickness="0,0,0,1"
+                Visibility="{Binding LoadError, Converter={StaticResource NullToVisible}}">
+            <ctl:BookingStepper />
+        </Border>
+
+        <Grid Grid.Row="1" Margin="32,20,32,24" Visibility="{Binding LoadError, Converter={StaticResource NullToVisible}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="24" />
+                <ColumnDefinition Width="340" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Nội dung bước hiện tại + thanh nút -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding CurrentStep, Converter={StaticResource StepVis}, ConverterParameter=1}" Padding="0,0,8,0"><ctl:BookingStepShowtime /></ScrollViewer>
+                    <ctl:BookingStepSeats Visibility="{Binding CurrentStep, Converter={StaticResource StepVis}, ConverterParameter=2}" />
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding CurrentStep, Converter={StaticResource StepVis}, ConverterParameter=3}" Padding="0,0,8,0"><ctl:BookingStepCombos /></ScrollViewer>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding CurrentStep, Converter={StaticResource StepVis}, ConverterParameter=4}" Padding="0,0,8,0"><ctl:BookingStepPayment /></ScrollViewer>
+                </Grid>
+
+                <!-- Nút Quay lại / Tiếp tục (ẩn ở bước ⑤) -->
+                <Grid Grid.Row="1" Margin="0,16,0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CurrentStep}" Value="5"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <Button Content="← Quay lại" Style="{StaticResource SecondaryButton}" HorizontalAlignment="Left" Padding="22,12"
+                            Command="{Binding BackCommand}" IsEnabled="{Binding CanGoBack}" />
+                    <Button Content="{Binding NextText}" Style="{StaticResource CtaButton}" HorizontalAlignment="Right"
+                            Command="{Binding NextCommand}" IsEnabled="{Binding CanGoNext}" />
+                </Grid>
+            </Grid>
+
+            <!-- Tóm tắt đơn (bước ① - ④) hoặc vé (bước ⑤) -->
+            <ctl:BookingSummary Grid.Column="2" VerticalAlignment="Top">
+                <ctl:BookingSummary.Style>
+                    <Style TargetType="ctl:BookingSummary">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="5"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ctl:BookingSummary.Style>
+            </ctl:BookingSummary>
+
+            <ScrollViewer Grid.ColumnSpan="3" VerticalScrollBarVisibility="Auto" Visibility="{Binding CurrentStep, Converter={StaticResource StepVis}, ConverterParameter=5}">
+                <ctl:BookingStepDone />
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Dialog hết thời gian giữ ghế -->
+        <Grid Grid.RowSpan="2" Background="{StaticResource ScrimBrush}" Visibility="{Binding IsExpiredDialogOpen, Converter={StaticResource BoolToVis}}">
+            <Border Width="420" Padding="28" CornerRadius="12" Background="{StaticResource NavySurface}" BorderBrush="{StaticResource NavyBorder}" BorderThickness="1"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel>
+                    <TextBlock Text="Hết thời gian giữ ghế" Style="{StaticResource TextH2}" />
+                    <TextBlock Text="Ghế của bạn đã được nhả để người khác có thể đặt. Vui lòng chọn lại suất và ghế." Style="{StaticResource TextSecondaryBody}" Margin="0,10,0,20" />
+                    <Button Content="Chọn lại" Style="{StaticResource CtaButton}" HorizontalAlignment="Right" Command="{Binding ConfirmExpiredCommand}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

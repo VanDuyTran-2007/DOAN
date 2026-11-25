@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/BACKEND_NOTES.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Solution Items/" />
+  <Project Path="D:/Lập trình trực quan/DOAN/CINEMA_CENTER/src/CineBook.Api/CineBook.Api.csproj" />
+  <Project Path="D:/Lập trình trực quan/DOAN/CINEMA_CENTER/src/CineBook.App/CineBook.App.csproj" />
+</Solution>

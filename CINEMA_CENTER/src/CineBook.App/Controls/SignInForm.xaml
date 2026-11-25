@@ -1,0 +1,49 @@
+<UserControl x:Class="CineBook.Controls.SignInForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:h="clr-namespace:CineBook.Helpers">
+    <!-- DataContext = AuthViewModel -->
+    <StackPanel>
+        <TextBlock Text="Email hoặc số điện thoại" Style="{StaticResource FieldLabel}" Margin="0,0,0,5" />
+        <TextBox x:Name="IdentityBox" Text="{Binding SignIn.Identity, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=IdentityBox}" />
+
+        <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}" />
+        <Grid>
+            <!-- PasswordBox (ẩn ký tự) và TextBox (hiện ký tự) dùng chung 1 giá trị; nút con mắt chuyển qua lại -->
+            <PasswordBox x:Name="PwdBox" h:PasswordHelper.Attach="True" Padding="12,9,40,9"
+                         h:PasswordHelper.Password="{Binding SignIn.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Visibility="{Binding SignIn.ShowPassword, Converter={StaticResource InvBoolToVis}}" />
+            <TextBox Text="{Binding SignIn.Password, UpdateSourceTrigger=PropertyChanged}" Padding="12,9,40,9"
+                     Visibility="{Binding SignIn.ShowPassword, Converter={StaticResource BoolToVis}}" />
+            <ToggleButton Style="{StaticResource EyeToggle}" HorizontalAlignment="Right" IsChecked="{Binding SignIn.ShowPassword}" />
+        </Grid>
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PwdBox}" />
+
+        <Grid Margin="0,12,0,0">
+            <CheckBox Content="Ghi nhớ tôi" IsChecked="{Binding SignIn.RememberMe}" />
+            <Button Content="Quên mật khẩu?" Style="{StaticResource LinkButton}" HorizontalAlignment="Right" Command="{Binding ForgotPasswordCommand}" />
+        </Grid>
+
+        <TextBlock Text="{Binding ServerError}" Style="{StaticResource FieldError}" Margin="0,10,0,0" />
+
+        <Button Style="{StaticResource SubmitButton}" Margin="0,14,0,0" Command="{Binding SignInCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
+            <TextBlock Text="Đăng nhập" Foreground="{StaticResource TextPrimary}" />
+        </Button>
+
+        <!-- Phân cách "hoặc" -->
+        <Grid Margin="0,18">
+            <Border Height="1" Background="{StaticResource NavyBorder}" VerticalAlignment="Center" />
+            <TextBlock Text="hoặc" Style="{StaticResource TextCaption}" HorizontalAlignment="Center" Padding="10,0" Background="Transparent" />
+        </Grid>
+        <UniformGrid Columns="2">
+            <Button Content="Google" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Command="{Binding SocialCommand}" CommandParameter="Google" />
+            <Button Content="Facebook" Style="{StaticResource SecondaryButton}" Margin="5,0,0,0" Command="{Binding SocialCommand}" CommandParameter="Facebook" />
+        </UniformGrid>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+            <TextBlock Text="Chưa có tài khoản?" Style="{StaticResource TextCaption}" VerticalAlignment="Center" />
+            <Button Content="Đăng ký" Style="{StaticResource LinkButton}" Command="{Binding GoSignUpCommand}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

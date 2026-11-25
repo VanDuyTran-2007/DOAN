@@ -1,0 +1,172 @@
+<UserControl x:Class="CineBook.Controls.HeaderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <UserControl.Resources>
+        <!-- Nút menu: gạch chân burgundy khi active và khi hover (animation 150ms) -->
+        <Style x:Key="MenuButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="{StaticResource AppFont}" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="Transparent">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <Border x:Name="Underline" Height="2" Background="{StaticResource Burgundy}" VerticalAlignment="Bottom"
+                                    Margin="10,0" Opacity="0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Underline" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" /></Storyboard></BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard><Storyboard><DoubleAnimation Storyboard.TargetName="Underline" Storyboard.TargetProperty="Opacity" To="0" Duration="0:0:0.15" /></Storyboard></BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <!-- Tag = true: mục đang active -->
+                            <Trigger Property="Tag" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+                                <Setter TargetName="Underline" Property="Opacity" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PopupMenuItem" TargetType="Button" BasedOn="{StaticResource GhostButton}">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Padding" Value="14,9" />
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="{StaticResource NavyDark}" BorderBrush="{StaticResource NavyBorder}" BorderThickness="0,0,0,1" Height="64">
+        <Grid Margin="24,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Logo chữ + gradient -->
+            <Button Grid.Column="0" Style="{StaticResource GhostButton}" Command="{Binding GoHomeCommand}" Padding="4,0" VerticalAlignment="Center">
+                <TextBlock Text="CineBook" FontSize="26" FontWeight="ExtraBold">
+                    <TextBlock.Foreground>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{StaticResource BurgundyHoverColor}" Offset="0" />
+                            <GradientStop Color="{StaticResource AccentGoldColor}" Offset="1" />
+                        </LinearGradientBrush>
+                    </TextBlock.Foreground>
+                </TextBlock>
+            </Button>
+
+            <!-- Menu giữa -->
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="24,0">
+                <Button Content="Đặt vé" Style="{StaticResource MenuButton}" Command="{Binding GoBookingCommand}"
+                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Booking}" />
+                <Button Content="Rạp chiếu" Style="{StaticResource MenuButton}" Command="{Binding GoCinemasCommand}"
+                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Cinemas}" />
+                <Button x:Name="CategoryButton" Content="Danh mục ▾" Style="{StaticResource MenuButton}" Command="{Binding ToggleCategoryCommand}"
+                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Categories}" />
+                <Button Content="Phim" Style="{StaticResource MenuButton}" Command="{Binding GoMoviesCommand}"
+                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Movies}" />
+
+                <!-- Dropdown thể loại -->
+                <Popup IsOpen="{Binding IsCategoryOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=CategoryButton}"
+                       Placement="Bottom" StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+                    <Border Margin="0,6,12,12" Background="{StaticResource NavySurface}" BorderBrush="{StaticResource NavyBorder}"
+                            BorderThickness="1" CornerRadius="8" MinWidth="180" Padding="6">
+                        <Border.Effect><DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.5" /></Border.Effect>
+                        <ItemsControl ItemsSource="{Binding Genres}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding}" Style="{StaticResource PopupMenuItem}"
+                                            Command="{Binding DataContext.GoGenreCommand, ElementName=Root}" CommandParameter="{Binding}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </Popup>
+            </StackPanel>
+
+            <!-- Bên phải: tìm kiếm, vị trí, tài khoản -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Ô tìm kiếm -->
+                <Grid Width="230" Margin="0,0,12,0">
+                    <TextBox x:Name="SearchBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" Padding="36,8,12,8" />
+                    <Path Data="{StaticResource IconSearch}" Fill="{StaticResource TextMuted}" Width="16" Height="16" Stretch="Uniform"
+                          HorizontalAlignment="Left" Margin="12,0,0,0" IsHitTestVisible="False" />
+                    <TextBlock Text="Tìm phim..." Foreground="{StaticResource TextMuted}" Margin="36,0,0,0" VerticalAlignment="Center"
+                               IsHitTestVisible="False" Visibility="{Binding SearchText, Converter={StaticResource NullToVisible}}" />
+                    <Popup IsOpen="{Binding IsSearchOpen, Mode=OneWay}" PlacementTarget="{Binding ElementName=SearchBox}" Placement="Bottom"
+                           AllowsTransparency="True" PopupAnimation="Fade">
+                        <Border Margin="0,6,12,12" Width="300" Background="{StaticResource NavySurface}" BorderBrush="{StaticResource NavyBorder}"
+                                BorderThickness="1" CornerRadius="8" Padding="6">
+                            <Border.Effect><DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.5" /></Border.Effect>
+                            <ItemsControl ItemsSource="{Binding SearchResults}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource PopupMenuItem}" Command="{Binding DataContext.OpenResultCommand, ElementName=Root}"
+                                                CommandParameter="{Binding}">
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding GenresText}" Style="{StaticResource TextCaption}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+                    </Popup>
+                </Grid>
+
+                <!-- Chọn thành phố -->
+                <Path Data="{StaticResource IconLocation}" Fill="{StaticResource AccentGold}" Width="18" Height="18" Stretch="Uniform" Margin="0,0,6,0" />
+                <ComboBox ItemsSource="{Binding Cities}" SelectedItem="{Binding State.SelectedCity, Mode=TwoWay}"
+                          Width="120" Padding="10,7" Margin="0,0,16,0">
+                    <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding City}" /></DataTemplate></ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- Chưa đăng nhập -->
+                <StackPanel Orientation="Horizontal" Visibility="{Binding IsSignedIn, Converter={StaticResource InvBoolToVis}}">
+                    <Button Content="Đăng nhập" Style="{StaticResource SecondaryButton}" Command="{Binding SignInCommand}" Padding="16,8" Margin="0,0,8,0" />
+                    <Button Content="Đăng ký" Style="{StaticResource PrimaryButton}" Command="{Binding SignUpCommand}" Padding="16,8" />
+                </StackPanel>
+
+                <!-- Đã đăng nhập: avatar + dropdown -->
+                <StackPanel Orientation="Horizontal" Visibility="{Binding IsSignedIn, Converter={StaticResource BoolToVis}}">
+                    <Button x:Name="AvatarButton" Style="{StaticResource GhostButton}" Command="{Binding ToggleUserMenuCommand}" Padding="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="34" Height="34" CornerRadius="17" Background="{StaticResource BrandGradient}">
+                                <TextBlock Text="{Binding CurrentUser.Initials}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
+                            </Border>
+                            <TextBlock Text="{Binding CurrentUser.FullName}" VerticalAlignment="Center" Margin="8,0,2,0" Foreground="{StaticResource TextPrimary}" />
+                            <Path Data="{StaticResource IconChevronDown}" Fill="{StaticResource TextSecondary}" Width="14" Height="14" Stretch="Uniform" />
+                        </StackPanel>
+                    </Button>
+                    <Popup IsOpen="{Binding IsUserMenuOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=AvatarButton}" Placement="Bottom"
+                           StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade">
+                        <Border Margin="0,6,12,12" MinWidth="170" Background="{StaticResource NavySurface}" BorderBrush="{StaticResource NavyBorder}"
+                                BorderThickness="1" CornerRadius="8" Padding="6">
+                            <Border.Effect><DropShadowEffect BlurRadius="18" ShadowDepth="4" Opacity="0.5" /></Border.Effect>
+                            <StackPanel>
+                                <Button Content="Tài khoản" Style="{StaticResource PopupMenuItem}" Command="{Binding DataContext.GoAccountCommand, ElementName=Root}" />
+                                <Button Content="Vé của tôi" Style="{StaticResource PopupMenuItem}" Command="{Binding DataContext.GoMyTicketsCommand, ElementName=Root}" />
+                                <Button Content="Đăng xuất" Style="{StaticResource PopupMenuItem}" Command="{Binding DataContext.SignOutCommand, ElementName=Root}" />
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

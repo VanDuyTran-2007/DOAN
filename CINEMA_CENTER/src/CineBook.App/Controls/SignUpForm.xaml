@@ -1,0 +1,59 @@
+<UserControl x:Class="CineBook.Controls.SignUpForm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:h="clr-namespace:CineBook.Helpers">
+    <!-- DataContext = AuthViewModel -->
+    <StackPanel>
+        <TextBlock Text="Họ và tên" Style="{StaticResource FieldLabel}" Margin="0,0,0,5" />
+        <TextBox x:Name="NameBox" Text="{Binding SignUp.FullName, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=NameBox}" />
+
+        <TextBlock Text="Email" Style="{StaticResource FieldLabel}" />
+        <TextBox x:Name="EmailBox" Text="{Binding SignUp.Email, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=EmailBox}" />
+
+        <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="10" /><ColumnDefinition /></Grid.ColumnDefinitions>
+            <StackPanel>
+                <TextBlock Text="Số điện thoại" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="PhoneBox" Text="{Binding SignUp.Phone, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" />
+                <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PhoneBox}" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Ngày sinh (dd/MM/yyyy)" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="BirthBox" Text="{Binding SignUp.BirthDate, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" />
+                <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=BirthBox}" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}" />
+        <Grid>
+            <PasswordBox x:Name="PwdBox" h:PasswordHelper.Attach="True" Padding="12,9,40,9"
+                         h:PasswordHelper.Password="{Binding SignUp.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Visibility="{Binding SignUp.ShowPassword, Converter={StaticResource InvBoolToVis}}" />
+            <TextBox Text="{Binding SignUp.Password, UpdateSourceTrigger=PropertyChanged}" Padding="12,9,40,9"
+                     Visibility="{Binding SignUp.ShowPassword, Converter={StaticResource BoolToVis}}" />
+            <ToggleButton Style="{StaticResource EyeToggle}" HorizontalAlignment="Right" IsChecked="{Binding SignUp.ShowPassword}" />
+        </Grid>
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PwdBox}" />
+
+        <TextBlock Text="Nhập lại mật khẩu" Style="{StaticResource FieldLabel}" />
+        <PasswordBox x:Name="ConfirmBox" h:PasswordHelper.Attach="True"
+                     h:PasswordHelper.Password="{Binding SignUp.ConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=ConfirmBox}" />
+
+        <CheckBox x:Name="TermsBox" Margin="0,14,0,0" IsChecked="{Binding SignUp.AcceptTerms}" Content="Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật" />
+        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TermsBox}" />
+
+        <TextBlock Text="{Binding ServerError}" Style="{StaticResource FieldError}" Margin="0,10,0,0" />
+
+        <Button Style="{StaticResource SubmitButton}" Margin="0,14,0,0" Command="{Binding SignUpCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
+            <TextBlock Text="Tạo tài khoản" Foreground="{StaticResource TextPrimary}" />
+        </Button>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+            <TextBlock Text="Đã có tài khoản?" Style="{StaticResource TextCaption}" VerticalAlignment="Center" />
+            <Button Content="Đăng nhập" Style="{StaticResource LinkButton}" Command="{Binding GoSignInCommand}" />
+        </StackPanel>
+    </StackPanel>
+</UserControl>
