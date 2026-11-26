@@ -19,8 +19,18 @@ public static class MockData
     ];
 
     private static Cinema C(string id, string brand, string name, string addr, string district, string city, double lat, double lng) =>
-        new() { Id = id, BrandId = brand, Name = name, Address = addr, District = district, City = city, Latitude = lat, Longitude = lng,
-                Brand = Brands.First(b => b.Id == brand) };
+        new()
+        {
+            Id = id,
+            BrandId = brand,
+            Name = name,
+            Address = addr,
+            District = district,
+            City = city,
+            Latitude = lat,
+            Longitude = lng,
+            Brand = Brands.First(b => b.Id == brand)
+        };
 
     public static readonly IReadOnlyList<Cinema> Cinemas =
     [
@@ -41,28 +51,42 @@ public static class MockData
         C("cs-4", "cinestar", "Cinestar Hà Nội Royal City", "72A Nguyễn Trãi, Thanh Xuân", "Thanh Xuân", "Hà Nội", 21.0025, 105.8150),
     ];
 
-    private static Movie M(string id, string title, string orig, string[] genres, int min, AgeRating age, int dayOffset,
-                           double rating, MovieStatus st, bool hot, string color, string director, string[] cast, string desc,
-                           string trailerUrl = "", string posterUrl = "", string backdropUrl = "") =>
-        new() { Id = id, Title = title, OriginalTitle = orig, Genres = genres, DurationMinutes = min, AgeRating = age,
-                ReleaseDate = DateTime.Today.AddDays(dayOffset), Rating = rating, Status = st, IsHot = hot,
-                PlaceholderColorHex = color, Director = director, Cast = cast, Description = desc,
-                TrailerUrl = trailerUrl, PosterUrl = posterUrl, BackdropUrl = backdropUrl };
+    private static Movie M(string id, string title, string orig, string posterFile, string[] genres, int min, AgeRating age, int dayOffset,
+                           double rating, MovieStatus st, bool hot, string color, string director, string[] cast, string desc) =>
+        new()
+        {
+            Id = id,
+            Title = title,
+            OriginalTitle = orig,
+            PosterUrl = $"pack://application:,,,/poster/{posterFile}",
+            Genres = genres,
+            DurationMinutes = min,
+            AgeRating = age,
+            ReleaseDate = DateTime.Today.AddDays(dayOffset),
+            Rating = rating,
+            Status = st,
+            IsHot = hot,
+            PlaceholderColorHex = color,
+            Director = director,
+            Cast = cast,
+            Description = desc,
+            TrailerUrl = "https://example.com/trailer/" + id
+        };
 
     public static readonly IReadOnlyList<Movie> Movies =
     [
-        M("m01", "Bóng Đêm Thành Phố", "City of Shadows", ["Hành động", "Hình sự"], 128, AgeRating.T16, -20, 8.1, MovieStatus.NowShowing, true, "#7A1030", "Trần Minh Khải", ["Lâm Vỹ", "Ngọc Hân", "Quốc Bảo"], "Một cựu cảnh sát buộc phải quay lại đường phố Sài Gòn về đêm để truy tìm kẻ đứng sau vụ cướp ngân hàng bí ẩn."),
-        M("m02", "Lời Nguyền Căn Nhà Cũ", "The Old House", ["Kinh dị"], 105, AgeRating.T18, -12, 7.4, MovieStatus.NowShowing, true, "#3A0F1A", "Phạm Thu Hà", ["Thanh Mai", "Đức Anh"], "Gia đình trẻ chuyển vào căn nhà cổ và dần phát hiện những bí mật đáng sợ ẩn dưới tầng hầm."),
-        M("m03", "Phi Đội Mặt Trăng", "Moon Squadron", ["Hoạt hình", "Phiêu lưu"], 98, AgeRating.P, -8, 8.6, MovieStatus.NowShowing, true, "#1D5FA8", "Lê Anh Tuấn", ["Bé Na (lồng tiếng)", "Hoàng Long (lồng tiếng)"], "Nhóm bạn nhỏ cùng chú robot lên mặt trăng để cứu lấy thành phố khỏi một cơn bão sao."),
-        M("m04", "Mùa Hè Của Chúng Ta", "Our Summer", ["Tình cảm", "Hài"], 112, AgeRating.T13, -15, 7.8, MovieStatus.NowShowing, false, "#C2527A", "Nguyễn Thảo Vy", ["Khánh Linh", "Gia Huy"], "Hai người bạn thân thời cấp ba gặp lại nhau sau mười năm trong một chuyến đi xuyên Việt."),
-        M("m05", "Đế Chế Rồng Lửa", "Dragonfire Empire", ["Hành động", "Giả tưởng"], 145, AgeRating.T13, -5, 8.9, MovieStatus.NowShowing, true, "#B5471B", "Đỗ Quang Vinh", ["Hải Đăng", "Bích Phương", "Minh Tâm"], "Cuộc chiến giành ngai vàng giữa các bộ tộc rồng bùng nổ khi lời tiên tri cổ xưa ứng nghiệm."),
-        M("m06", "Hồ Sơ Mất Tích", "Missing File", ["Hình sự", "Kinh dị"], 119, AgeRating.T16, -25, 7.2, MovieStatus.NowShowing, false, "#24476B", "Vũ Hoàng Nam", ["Thu Trang", "Tiến Luật"], "Một nữ phóng viên lần theo manh mối của chuỗi vụ mất tích tại một thị trấn ven biển."),
-        M("m07", "Chú Mèo Đi Tìm Biển", "The Cat Who Sought the Sea", ["Hoạt hình", "Gia đình"], 92, AgeRating.K, -30, 8.3, MovieStatus.NowShowing, false, "#2A8F8A", "Hoàng Mỹ Linh", ["Lồng tiếng: Ngọc Lan"], "Chú mèo nhỏ rời làng chài để tìm hiểu vì sao biển lại biết hát."),
-        M("m08", "Cuộc Đua Cuối Cùng", "Last Lap", ["Hành động", "Thể thao"], 124, AgeRating.T13, -3, 7.6, MovieStatus.NowShowing, false, "#555F7A", "Bùi Thế Sơn", ["Tuấn Kiệt", "Mỹ Duyên"], "Tay đua kỳ cựu quyết định ra đường đua một lần cuối để cứu đội xe của gia đình."),
-        M("m09", "Vùng Đất Quên Lãng", "Forgotten Land", ["Giả tưởng", "Phiêu lưu"], 135, AgeRating.T13, 10, 0, MovieStatus.ComingSoon, true, "#4B2C83", "Trần Minh Khải", ["Hà Anh", "Văn Toàn"], "Một cánh cổng cổ mở ra vùng đất nơi mọi ký ức bị lãng quên đều sống dậy."),
-        M("m10", "Đám Cưới Bất Đắc Dĩ", "Reluctant Wedding", ["Hài", "Tình cảm"], 104, AgeRating.T13, 17, 0, MovieStatus.ComingSoon, false, "#C98A3C", "Nguyễn Thảo Vy", ["Trúc Anh", "Khôi Nguyên"], "Hai kẻ thù không đội trời chung bị gia đình ép làm đám cưới giả để cứu công ty."),
-        M("m11", "Tiếng Gọi Từ Vực Sâu", "Call from the Deep", ["Kinh dị", "Hồi hộp"], 111, AgeRating.T18, 24, 0, MovieStatus.ComingSoon, true, "#10303F", "Phạm Thu Hà", ["Lan Phương", "Quang Huy"], "Đội thợ lặn nhận được tín hiệu cầu cứu từ một con tàu đã chìm hàng chục năm."),
-        M("m12", "Siêu Nhân Nhí", "Little Heroes", ["Hoạt hình", "Hài"], 90, AgeRating.P, 31, 0, MovieStatus.ComingSoon, false, "#D1563A", "Lê Anh Tuấn", ["Lồng tiếng: Bảo Nam"], "Biệt đội siêu nhân tí hon bảo vệ khu phố trước kế hoạch của giáo sư Bụi."),
+        M("m01", "Bóng Đêm Thành Phố", "City of Shadows", "City of Shadows.jpg", ["Hành động", "Hình sự"], 128, AgeRating.T16, -20, 8.1, MovieStatus.NowShowing, true, "#7A1030", "Trần Minh Khải", ["Lâm Vỹ", "Ngọc Hân", "Quốc Bảo"], "Một cựu cảnh sát buộc phải quay lại đường phố Sài Gòn về đêm để truy tìm kẻ đứng sau vụ cướp ngân hàng bí ẩn."),
+        M("m02", "Lời Nguyền Căn Nhà Cũ", "The Old House", "The Old House.jpg", ["Kinh dị"], 105, AgeRating.T18, -12, 7.4, MovieStatus.NowShowing, true, "#3A0F1A", "Phạm Thu Hà", ["Thanh Mai", "Đức Anh"], "Gia đình trẻ chuyển vào căn nhà cổ và dần phát hiện những bí mật đáng sợ ẩn dưới tầng hầm."),
+        M("m03", "Phi Đội Mặt Trăng", "Moon Squadron", "Moon Squadron.jpg", ["Hoạt hình", "Phiêu lưu"], 98, AgeRating.P, -8, 8.6, MovieStatus.NowShowing, true, "#1D5FA8", "Lê Anh Tuấn", ["Bé Na (lồng tiếng)", "Hoàng Long (lồng tiếng)"], "Nhóm bạn nhỏ cùng chú robot lên mặt trăng để cứu lấy thành phố khỏi một cơn bão sao."),
+        M("m04", "Mùa Hè Của Chúng Ta", "Our Summer", "Our Summer.jpg", ["Tình cảm", "Hài"], 112, AgeRating.T13, -15, 7.8, MovieStatus.NowShowing, false, "#C2527A", "Nguyễn Thảo Vy", ["Khánh Linh", "Gia Huy"], "Hai người bạn thân thời cấp ba gặp lại nhau sau mười năm trong một chuyến đi xuyên Việt."),
+        M("m05", "Đế Chế Rồng Lửa", "Dragonfire Empire", "Dragon Empire.jpg", ["Hành động", "Giả tưởng"], 145, AgeRating.T13, -5, 8.9, MovieStatus.NowShowing, true, "#B5471B", "Đỗ Quang Vinh", ["Hải Đăng", "Bích Phương", "Minh Tâm"], "Cuộc chiến giành ngai vàng giữa các bộ tộc rồng bùng nổ khi lời tiên tri cổ xưa ứng nghiệm."),
+        M("m06", "Hồ Sơ Mất Tích", "Missing File", "Missing File.jpg", ["Hình sự", "Kinh dị"], 119, AgeRating.T16, -25, 7.2, MovieStatus.NowShowing, false, "#24476B", "Vũ Hoàng Nam", ["Thu Trang", "Tiến Luật"], "Một nữ phóng viên lần theo manh mối của chuỗi vụ mất tích tại một thị trấn ven biển."),
+        M("m07", "Chú Mèo Đi Tìm Biển", "The Cat Who Sought the Sea", "The Cat Who Sought The Sea.jpg", ["Hoạt hình", "Gia đình"], 92, AgeRating.K, -30, 8.3, MovieStatus.NowShowing, false, "#2A8F8A", "Hoàng Mỹ Linh", ["Lồng tiếng: Ngọc Lan"], "Chú mèo nhỏ rời làng chài để tìm hiểu vì sao biển lại biết hát."),
+        M("m08", "Cuộc Đua Cuối Cùng", "Last Lap", "Last Lap.jpg", ["Hành động", "Thể thao"], 124, AgeRating.T13, -3, 7.6, MovieStatus.NowShowing, false, "#555F7A", "Bùi Thế Sơn", ["Tuấn Kiệt", "Mỹ Duyên"], "Tay đua kỳ cựu quyết định ra đường đua một lần cuối để cứu đội xe của gia đình."),
+        M("m09", "Vùng Đất Quên Lãng", "Forgotten Land", "Forgotten Land.jpg", ["Giả tưởng", "Phiêu lưu"], 135, AgeRating.T13, 10, 0, MovieStatus.ComingSoon, true, "#4B2C83", "Trần Minh Khải", ["Hà Anh", "Văn Toàn"], "Một cánh cổng cổ mở ra vùng đất nơi mọi ký ức bị lãng quên đều sống dậy."),
+        M("m10", "Đám Cưới Bất Đắc Dĩ", "Reluctant Wedding", "Reluctant Wedding.jpg", ["Hài", "Tình cảm"], 104, AgeRating.T13, 17, 0, MovieStatus.ComingSoon, false, "#C98A3C", "Nguyễn Thảo Vy", ["Trúc Anh", "Khôi Nguyên"], "Hai kẻ thù không đội trời chung bị gia đình ép làm đám cưới giả để cứu công ty."),
+        M("m11", "Tiếng Gọi Từ Vực Sâu", "Call from the Deep", "Call From The Deep.jpg", ["Kinh dị", "Hồi hộp"], 111, AgeRating.T18, 24, 0, MovieStatus.ComingSoon, true, "#10303F", "Phạm Thu Hà", ["Lan Phương", "Quang Huy"], "Đội thợ lặn nhận được tín hiệu cầu cứu từ một con tàu đã chìm hàng chục năm."),
+        M("m12", "Siêu Nhân Nhí", "Little Heroes", "Little Heroes.jpg", ["Hoạt hình", "Hài"], 90, AgeRating.P, 31, 0, MovieStatus.ComingSoon, false, "#D1563A", "Lê Anh Tuấn", ["Lồng tiếng: Bảo Nam"], "Biệt đội siêu nhân tí hon bảo vệ khu phố trước kế hoạch của giáo sư Bụi."),
     ];
 
     public static readonly IReadOnlyList<GeoLocation> Cities =
@@ -105,8 +129,14 @@ public static class MockData
         return new Showtime
         {
             Id = $"st|{movieId}|{cinemaId}|{date:yyyyMMdd}|{slot}",
-            MovieId = movieId, CinemaId = cinemaId, AuditoriumId = $"{cinemaId}-r{slot % 3 + 1}",
-            AuditoriumName = $"Phòng {slot % 3 + 1}", StartTime = start, Format = format, Language = lang, BasePrice = basePrice
+            MovieId = movieId,
+            CinemaId = cinemaId,
+            AuditoriumId = $"{cinemaId}-r{slot % 3 + 1}",
+            AuditoriumName = $"Phòng {slot % 3 + 1}",
+            StartTime = start,
+            Format = format,
+            Language = lang,
+            BasePrice = basePrice
         };
     }
 

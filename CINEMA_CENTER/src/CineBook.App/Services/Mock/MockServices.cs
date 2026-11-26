@@ -1,3 +1,5 @@
+using System.IO;
+using System.Text.Json;
 using CineBook.Models;
 using CineBook.Services.Interfaces;
 
@@ -170,29 +172,80 @@ public class MockSeatService : ISeatService
 
 public class MockAuthService : IAuthService
 {
+    private record SavedAccount(User User, string Password);
+
+    private static readonly string StorePath = Path.Combine(AppContext.BaseDirectory, "mock_users.json");
+    private static readonly List<SavedAccount> _users = LoadUsers();
+
     public User? CurrentUser { get; private set; }
     public event EventHandler? AuthStateChanged;
 
+    private static List<SavedAccount> LoadUsers()
+    {
+        try
+        {
+            if (File.Exists(StorePath))
+            {
+                var json = File.ReadAllText(StorePath);
+                var list = JsonSerializer.Deserialize<List<SavedAccount>>(json);
+                if (list is { Count: > 0 }) return list;
+            }
+        }
+        catch { }
+
+        return
+        [
+            new SavedAccount(
+                new User { Id = "u1", FullName = "Nguyễn Văn An", Email = "an@example.com", Phone = "0900000000", MemberTier = MemberTier.Silver },
+                "123456")
+        ];
+    }
+
+    private static void SaveUsers()
+    {
+        try
+        {
+            var json = JsonSerializer.Serialize(_users);
+            File.WriteAllText(StorePath, json);
+        }
+        catch { }
+    }
+
     public async Task<AuthResult> SignInAsync(string identity, string password, CancellationToken ct = default)
     {
-        await Net.Delay(ct, 900);
-        if (password == "wrong-password") return new AuthResult(false, "Email/SĐT hoặc mật khẩu không đúng", null);
-        CurrentUser = new User
-        {
-            Id = "u1",
-            FullName = "Nguyễn Văn An",
-            Email = identity.Contains('@') ? identity : "an@example.com",
-            Phone = identity.Contains('@') ? "0900000000" : identity,
-            MemberTier = MemberTier.Silver
-        };
+        await Net.Delay(ct, 600);
+        var key = identity.Trim();
+
+        var matched = _users.FirstOrDefault(x =>
+            (x.User.Email.Equals(key, StringComparison.OrdinalIgnoreCase) || x.User.Phone == key)
+            && x.Password == password);
+
+        if (matched is null)
+            return new AuthResult(false, "Email/SĐT hoặc mật khẩu không đúng", null);
+
+        CurrentUser = matched.User;
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
         return new AuthResult(true, null, CurrentUser);
     }
 
     public async Task<AuthResult> SignUpAsync(SignUpRequest r, CancellationToken ct = default)
     {
-        await Net.Delay(ct, 1000);
-        CurrentUser = new User { Id = "u2", FullName = r.FullName, Email = r.Email, Phone = r.Phone, MemberTier = MemberTier.Standard };
+        await Net.Delay(ct, 700);
+        if (_users.Any(x => x.User.Email.Equals(r.Email.Trim(), StringComparison.OrdinalIgnoreCase) || x.User.Phone == r.Phone.Trim()))
+            return new AuthResult(false, "Email hoặc SĐT đã được đăng ký", null);
+
+        var newUser = new User
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            FullName = r.FullName.Trim(),
+            Email = r.Email.Trim(),
+            Phone = r.Phone.Trim(),
+            MemberTier = MemberTier.Standard
+        };
+        _users.Add(new SavedAccount(newUser, r.Password));
+        SaveUsers();
+
+        CurrentUser = newUser;
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
         return new AuthResult(true, null, CurrentUser);
     }
