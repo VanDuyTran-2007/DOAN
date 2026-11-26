@@ -71,7 +71,7 @@
                             <TextBlock Text="{Binding Description}" Margin="0,12,0,0" Style="{StaticResource TextBody}" MaxHeight="44" TextTrimming="CharacterEllipsis" />
                             <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
                                 <Button Content="Đặt vé ngay" Style="{StaticResource CtaButton}" Margin="0,0,12,0"
-                                        Command="{Binding DataContext.OpenMovieCommand, ElementName=Root}" CommandParameter="{Binding}" />
+                                        Command="{Binding DataContext.BookMovieCommand, ElementName=Root}" CommandParameter="{Binding}" />
                                 <Button Content="▶  Xem trailer" Style="{StaticResource SecondaryButton}" Padding="22,13"
                                         Command="{Binding DataContext.WatchTrailerCommand, ElementName=Root}" CommandParameter="{Binding}" />
                             </StackPanel>

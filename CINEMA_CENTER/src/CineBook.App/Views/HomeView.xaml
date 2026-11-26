@@ -4,6 +4,7 @@
              xmlns:ctl="clr-namespace:CineBook.Controls"
              x:Name="Root">
     <!-- DataContext = HomeViewModel. Trang cuộn dọc: Hero → Đang chiếu → HOT → Sắp chiếu → Rạp gần bạn -->
+    <ctl:CinematicPreviewHost BookMovieCommand="{Binding BookMovieCommand}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
             <ctl:HeroBanner />
@@ -12,7 +13,8 @@
                             OpenCommand="{Binding OpenMovieCommand}" RetryCommand="{Binding RetryNowShowingCommand}" />
 
             <ctl:MovieShelf Title="Phim HOT" Section="{Binding Hot}"
-                            OpenCommand="{Binding OpenMovieCommand}" RetryCommand="{Binding RetryHotCommand}" />
+                            OpenCommand="{Binding OpenMovieCommand}" RemindCommand="{Binding RemindCommand}"
+                            RetryCommand="{Binding RetryHotCommand}" />
 
             <ctl:MovieShelf Title="Phim sắp chiếu" Section="{Binding ComingSoon}"
                             OpenCommand="{Binding OpenMovieCommand}" RemindCommand="{Binding RemindCommand}"
@@ -56,4 +58,5 @@
             </StackPanel>
         </StackPanel>
     </ScrollViewer>
+    </ctl:CinematicPreviewHost>
 </UserControl>

@@ -166,11 +166,15 @@ public partial class HomeViewModel : ViewModelBase
     [RelayCommand] private void OpenHero() { if (CurrentHero is { } m) OpenMovie(m); }
 
     [RelayCommand]
+    private void BookMovie(Movie movie)
+        => _nav.NavigateTo<MovieDetailViewModel>(new MovieDetailArgs(movie.Id) { OpenSchedule = true });
+
+    [RelayCommand]
     private void WatchTrailer(Movie? movie)
     {
         movie ??= CurrentHero;
-        // TODO-BACKEND: Movie.TrailerUrl (YouTube/CDN). Frontend sẽ nhúng WebView2 khi có URL thật.
-        _toast.Show($"Trailer \"{movie?.Title}\" sẽ phát khi có URL thật từ backend", ToastKind.Info);
+        if (movie is not null)
+            _nav.NavigateTo<MovieDetailViewModel>(new MovieDetailArgs(movie.Id) { PlayTrailerOnOpen = true });
     }
 
     [RelayCommand]
