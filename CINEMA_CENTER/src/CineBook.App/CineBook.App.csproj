@@ -12,8 +12,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="poster\Call From The Deep.jpg" />
+    <None Remove="poster\City of Shadows.jpg" />
+    <None Remove="poster\Dragon Empire.jpg" />
+    <None Remove="poster\Forgotten Land.jpg" />
+    <None Remove="poster\Last Lap.jpg" />
+    <None Remove="poster\Little Heroes.jpg" />
+    <None Remove="poster\Missing File.jpg" />
+    <None Remove="poster\Moon Squadron.jpg" />
+    <None Remove="poster\Our Summer.jpg" />
+    <None Remove="poster\Reluctant Wedding.jpg" />
+    <None Remove="poster\The Cat Who Sought The Sea.jpg" />
+    <None Remove="poster\The Old House.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="poster\Call From The Deep.jpg" />
+    <Resource Include="poster\City of Shadows.jpg" />
+    <Resource Include="poster\Dragon Empire.jpg" />
+    <Resource Include="poster\Forgotten Land.jpg" />
+    <Resource Include="poster\Last Lap.jpg" />
+    <Resource Include="poster\Little Heroes.jpg" />
+    <Resource Include="poster\Missing File.jpg" />
+    <Resource Include="poster\Moon Squadron.jpg" />
+    <Resource Include="poster\Our Summer.jpg" />
+    <Resource Include="poster\Reluctant Wedding.jpg" />
+    <Resource Include="poster\The Cat Who Sought The Sea.jpg" />
+    <Resource Include="poster\The Old House.jpg" />
   </ItemGroup>
 
 </Project>
