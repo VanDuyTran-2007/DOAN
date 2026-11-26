@@ -37,10 +37,15 @@ public partial class MovieDetailViewModel : ViewModelBase
 
     public bool IsComingSoon => Movie?.Status == MovieStatus.ComingSoon;
     public string CityText => _state.SelectedCity?.City ?? "";
+    internal bool OpenSchedule { get; private set; }
+    internal bool PlayTrailerOnOpen { get; private set; }
 
     public override async Task OnNavigatedToAsync(object? parameter)
     {
-        var movieId = (parameter as MovieDetailArgs)?.MovieId ?? "";
+        var args = parameter as MovieDetailArgs;
+        var movieId = args?.MovieId ?? "";
+        OpenSchedule = args?.OpenSchedule == true;
+        PlayTrailerOnOpen = args?.PlayTrailerOnOpen == true;
         IsBusy = true;
         try
         {
@@ -101,11 +106,6 @@ public partial class MovieDetailViewModel : ViewModelBase
 
     [RelayCommand]
     private void Book(Showtime showtime) => _nav.NavigateTo<BookingViewModel>(new BookingArgs(showtime.Id));
-
-    [RelayCommand]
-    private void WatchTrailer()
-        // TODO-BACKEND: Movie.TrailerUrl; frontend sẽ nhúng WebView2 khi có URL thật.
-        => _toast.Show($"Trailer \"{Movie?.Title}\" sẽ phát khi có URL thật từ backend", ToastKind.Info);
 
     [RelayCommand]
     private void Remind()
