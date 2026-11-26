@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctl="clr-namespace:CineBook.Controls">
     <!-- DataContext = MovieDetailViewModel -->
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <Grid>
+        <ctl:CinematicAmbientLayer x:Name="Ambient" />
+        <ScrollViewer x:Name="MovieScroll" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="OnManualScroll">
         <StackPanel>
             <!-- Không tìm thấy phim -->
             <StackPanel Margin="0,120" HorizontalAlignment="Center" Visibility="{Binding NotFound, Converter={StaticResource BoolToVis}}">
@@ -12,67 +14,65 @@
             </StackPanel>
 
             <StackPanel Visibility="{Binding Movie, Converter={StaticResource NullToCollapsed}}">
-                <!-- ===== Backdrop + thông tin ===== -->
-                <Grid MinHeight="420" Background="{Binding Movie, Converter={StaticResource BackdropBrush}}">
-                    <Rectangle>
-                        <Rectangle.Fill>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                <GradientStop Color="#66070F1F" Offset="0" />
-                                <GradientStop Color="{StaticResource NavyDarkestColor}" Offset="1" />
-                            </LinearGradientBrush>
-                        </Rectangle.Fill>
-                    </Rectangle>
-
-                    <Button Style="{StaticResource GhostButton}" Command="{Binding GoBackCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,16,0,0">
+                <StackPanel Margin="40,16,40,4">
+                    <Button Style="{StaticResource GhostButton}" Command="{Binding GoBackCommand}" HorizontalAlignment="Left" Margin="0,0,0,18">
                         <StackPanel Orientation="Horizontal">
                             <Path Data="{StaticResource IconArrowBack}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" />
                             <TextBlock Text="Quay lại" Foreground="{StaticResource TextPrimary}" />
                         </StackPanel>
                     </Button>
 
-                    <StackPanel Orientation="Horizontal" Margin="64,64,64,32" VerticalAlignment="Bottom">
-                        <ctl:PosterView DataContext="{Binding Movie}" Width="220" Height="330" VerticalAlignment="Bottom">
-                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="36" ShadowDepth="8" Opacity="0.7" /></ctl:PosterView.Effect>
-                        </ctl:PosterView>
+                    <Grid x:Name="MediaRow" MaxWidth="1200" SizeChanged="OnMediaRowSizeChanged">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <ctl:PosterView x:Name="MoviePoster" DataContext="{Binding Movie}" VerticalAlignment="Center" />
+                        <ctl:CinematicTrailerPlayer x:Name="Trailer" Grid.Column="1" VerticalAlignment="Center" />
+                    </Grid>
 
-                        <StackPanel Margin="36,0,0,0" MaxWidth="760" VerticalAlignment="Bottom">
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                <Border Padding="9,3" CornerRadius="999" Background="{Binding Movie.AgeRating, Converter={StaticResource AgeBrush}}" Margin="0,0,8,0">
-                                    <TextBlock Text="{Binding Movie.AgeRating}" FontSize="12" FontWeight="Bold" />
-                                </Border>
-                                <Border Padding="9,3" CornerRadius="999" Background="{StaticResource AccentGold}" Visibility="{Binding Movie.IsHot, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="HOT" FontSize="12" FontWeight="ExtraBold" Foreground="{StaticResource NavyDarkest}" />
-                                </Border>
-                            </StackPanel>
-                            <TextBlock Text="{Binding Movie.Title}" Style="{StaticResource TextH1}" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding Movie.OriginalTitle}" Style="{StaticResource TextSecondaryBody}" Margin="0,2,0,0" />
-                            <TextBlock Margin="0,10,0,0" Style="{StaticResource TextSecondaryBody}">
-                                <Run Text="{Binding Movie.GenresText, Mode=OneWay}" /><Run Text="   ·   " /><Run Text="{Binding Movie.DurationText, Mode=OneWay}" /><Run Text="   ·   Khởi chiếu " /><Run Text="{Binding Movie.ReleaseText, Mode=OneWay}" />
-                            </TextBlock>
-                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Visibility="{Binding Movie.HasRating, Converter={StaticResource BoolToVis}}">
-                                <Path Data="{StaticResource IconStar}" Fill="{StaticResource AccentGold}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,6,0" />
-                                <TextBlock Text="{Binding Movie.RatingText}" FontWeight="Bold" FontSize="16" />
-                                <TextBlock Text=" / 10" Style="{StaticResource TextCaption}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
-                            </StackPanel>
-                            <TextBlock Text="{Binding Movie.Description}" Style="{StaticResource TextBody}" Margin="0,12,0,0" />
-                            <TextBlock Margin="0,12,0,0" Style="{StaticResource TextSecondaryBody}">
-                                <Run Text="Đạo diễn: " FontWeight="SemiBold" /><Run Text="{Binding Movie.Director, Mode=OneWay}" />
-                            </TextBlock>
-                            <TextBlock Margin="0,2,0,0" Style="{StaticResource TextSecondaryBody}">
-                                <Run Text="Diễn viên: " FontWeight="SemiBold" /><Run Text="{Binding Movie.CastText, Mode=OneWay}" />
-                            </TextBlock>
-                            <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
-                                <Button Content="▶  Xem trailer" Style="{StaticResource CtaButton}" Command="{Binding WatchTrailerCommand}" Margin="0,0,10,0" />
-                                <Button Content="Nhắc tôi" Style="{StaticResource SecondaryButton}" Padding="22,13" Command="{Binding RemindCommand}"
-                                        Visibility="{Binding IsComingSoon, Converter={StaticResource BoolToVis}}" />
-                            </StackPanel>
+                    <StackPanel MaxWidth="1200" HorizontalAlignment="Left" Margin="0,23,0,0">
+                        <TextBlock Text="{Binding Movie.Title}" Style="{StaticResource TextH1}" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Movie.OriginalTitle}" Style="{StaticResource TextSecondaryBody}" Margin="0,2,0,10" TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <Border Padding="9,3" CornerRadius="999" Background="{Binding Movie.AgeRating, Converter={StaticResource AgeBrush}}" Margin="0,0,8,0">
+                                <TextBlock Text="{Binding Movie.AgeRating}" FontSize="12" FontWeight="Bold" />
+                            </Border>
+                            <Border Padding="9,3" CornerRadius="999" Background="{StaticResource AccentGold}" Visibility="{Binding Movie.IsHot, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="HOT" FontSize="12" FontWeight="ExtraBold" Foreground="{StaticResource NavyDarkest}" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Margin="0,10,0,0" Style="{StaticResource TextSecondaryBody}">
+                            <Run Text="{Binding Movie.GenresText, Mode=OneWay}" /><Run Text="   ·   " /><Run Text="{Binding Movie.DurationText, Mode=OneWay}" /><Run Text="   ·   Khởi chiếu " /><Run Text="{Binding Movie.ReleaseText, Mode=OneWay}" />
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0" Visibility="{Binding Movie.HasRating, Converter={StaticResource BoolToVis}}">
+                            <Path Data="{StaticResource IconStar}" Fill="{StaticResource AccentGold}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,6,0" />
+                            <TextBlock Text="{Binding Movie.RatingText}" FontWeight="Bold" FontSize="16" />
+                            <TextBlock Text=" / 10" Style="{StaticResource TextCaption}" VerticalAlignment="Bottom" Margin="0,0,0,2" />
+                        </StackPanel>
+                        <TextBlock Text="{Binding Movie.Description}" Style="{StaticResource TextBody}" Margin="0,12,0,0" />
+                        <TextBlock Margin="0,12,0,0" Style="{StaticResource TextSecondaryBody}">
+                            <Run Text="Đạo diễn: " FontWeight="SemiBold" /><Run Text="{Binding Movie.Director, Mode=OneWay}" />
+                        </TextBlock>
+                        <TextBlock Margin="0,2,0,0" Style="{StaticResource TextSecondaryBody}">
+                            <Run Text="Diễn viên: " FontWeight="SemiBold" /><Run Text="{Binding Movie.CastText, Mode=OneWay}" />
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
+                            <Button Content="Đặt vé ngay" Style="{StaticResource CtaButton}" Click="OnBook"
+                                    Visibility="{Binding IsComingSoon, Converter={StaticResource InvBoolToVis}}" />
+                            <Button Content="Nhắc tôi" Style="{StaticResource SecondaryButton}" Padding="22,13" Command="{Binding RemindCommand}"
+                                    Visibility="{Binding IsComingSoon, Converter={StaticResource BoolToVis}}" />
                         </StackPanel>
                     </StackPanel>
-                </Grid>
+                </StackPanel>
 
                 <!-- ===== Lịch chiếu ===== -->
-                <StackPanel Margin="64,24,64,56">
-                    <TextBlock Text="Lịch chiếu" Style="{StaticResource TextH2}" />
+                <StackPanel Margin="40,24,40,56">
+                    <TextBlock x:Name="ScheduleHeading" Text="Lịch chiếu" Style="{StaticResource TextH2}" />
 
                     <TextBlock Style="{StaticResource TextSecondaryBody}" Margin="0,12,0,0" Visibility="{Binding IsComingSoon, Converter={StaticResource BoolToVis}}"
                                Text="Phim chưa mở bán vé. Bấm &quot;Nhắc tôi&quot; để nhận thông báo khi có lịch chiếu." />
@@ -126,5 +126,6 @@
                 </StackPanel>
             </StackPanel>
         </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

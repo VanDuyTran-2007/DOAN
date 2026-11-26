@@ -8,7 +8,14 @@ namespace CineBook.Navigation;
 // ---- Tham số truyền khi điều hướng ----
 public enum AuthTab { SignIn, SignUp }
 public record CategoriesArgs(string? Genre = null, MovieStatus? Status = null);
-public record MovieDetailArgs(string MovieId);
+public record MovieDetailArgs(string MovieId)
+{
+    public bool OpenSchedule { get; init; }
+    public bool PlayTrailerOnOpen { get; init; }
+
+    // Khi quay lại qua lịch sử điều hướng, chỉ hiển thị ảnh bìa trailer.
+    internal MovieDetailArgs ForHistory() => PlayTrailerOnOpen ? this with { PlayTrailerOnOpen = false } : this;
+}
 public record CinemasArgs(string? CinemaId = null);
 /// <param name="Step">Chỉ dùng cho dev/QA: mở thẳng bước 2/3/4.</param>
 /// <param name="DevSeats">Chỉ dùng cho dev/QA: tự chọn sẵn các ghế, ví dụ "F5,F6".</param>
@@ -62,7 +69,7 @@ public class NavigationService : ObservableObject, INavigationService
 
         // ViewModel đăng ký Transient → mỗi lần điều hướng là một instance mới.
         var vm = (ViewModelBase)_provider.GetRequiredService(type);
-        _currentEntry = (type, parameter);
+        _currentEntry = (type, parameter is MovieDetailArgs movieDetail ? movieDetail.ForHistory() : parameter);
         Current = vm;
         OnPropertyChanged(nameof(CanGoBack));
         Navigated?.Invoke(this, EventArgs.Empty);

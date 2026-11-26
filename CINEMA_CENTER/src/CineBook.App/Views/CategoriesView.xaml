@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctl="clr-namespace:CineBook.Controls">
     <!-- DataContext = CategoriesViewModel -->
+    <ctl:CinematicPreviewHost BookMovieCommand="{Binding BookMovieCommand}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="40,28,40,48">
             <StackPanel Orientation="Horizontal">
@@ -67,4 +68,5 @@
             </ctl:StatefulContent>
         </StackPanel>
     </ScrollViewer>
+    </ctl:CinematicPreviewHost>
 </UserControl>
