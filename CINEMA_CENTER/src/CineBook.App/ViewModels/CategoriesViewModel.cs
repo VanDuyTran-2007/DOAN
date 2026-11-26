@@ -111,6 +111,10 @@ public partial class CategoriesViewModel : ViewModelBase
     }
 
     [RelayCommand] private void OpenMovie(Movie movie) => _nav.NavigateTo<MovieDetailViewModel>(new MovieDetailArgs(movie.Id));
+    [RelayCommand]
+    private void BookMovie(Movie movie)
+        => _nav.NavigateTo<MovieDetailViewModel>(new MovieDetailArgs(movie.Id) { OpenSchedule = true });
+
     [RelayCommand] private void Remind(Movie movie) => _toast.Show($"Đã bật nhắc lịch khởi chiếu \"{movie.Title}\"", ToastKind.Success);
     [RelayCommand] private Task Retry() => ReloadAsync();
 }

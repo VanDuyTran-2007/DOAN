@@ -42,11 +42,12 @@ public static class MockData
     ];
 
     private static Movie M(string id, string title, string orig, string[] genres, int min, AgeRating age, int dayOffset,
-                           double rating, MovieStatus st, bool hot, string color, string director, string[] cast, string desc) =>
+                           double rating, MovieStatus st, bool hot, string color, string director, string[] cast, string desc,
+                           string trailerUrl = "", string posterUrl = "", string backdropUrl = "") =>
         new() { Id = id, Title = title, OriginalTitle = orig, Genres = genres, DurationMinutes = min, AgeRating = age,
                 ReleaseDate = DateTime.Today.AddDays(dayOffset), Rating = rating, Status = st, IsHot = hot,
                 PlaceholderColorHex = color, Director = director, Cast = cast, Description = desc,
-                TrailerUrl = "https://example.com/trailer/" + id };
+                TrailerUrl = trailerUrl, PosterUrl = posterUrl, BackdropUrl = backdropUrl };
 
     public static readonly IReadOnlyList<Movie> Movies =
     [

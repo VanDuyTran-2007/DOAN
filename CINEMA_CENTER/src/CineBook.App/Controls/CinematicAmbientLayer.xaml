@@ -1,0 +1,9 @@
+<UserControl x:Class="CineBook.Controls.CinematicAmbientLayer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="False" IsHitTestVisible="False">
+    <Grid>
+        <Border x:Name="Previous" Opacity="0" />
+        <Border x:Name="Current" Opacity="0" />
+    </Grid>
+</UserControl>
