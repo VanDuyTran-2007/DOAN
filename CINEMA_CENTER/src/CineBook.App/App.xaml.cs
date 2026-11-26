@@ -1,4 +1,3 @@
-using System.Windows;
 using CineBook.Helpers;
 using CineBook.Navigation;
 using CineBook.Services;
@@ -7,6 +6,7 @@ using CineBook.Services.Mock;
 using CineBook.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Windows;
 
 namespace CineBook;
 
@@ -35,11 +35,6 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
-        // ============================================================
-        // Backend team: thay các Mock* bên dưới bằng Api* (cùng interface).
-        // Mỗi dòng là 1 điểm thay duy nhất – không phải sửa View/ViewModel.
-        // Xem hướng dẫn từng bước trong docs/BACKEND_NOTES.md
-        // ============================================================
         // TODO-BACKEND: MockMovieService → ApiMovieService (HttpClient + JSON)
         services.AddSingleton<IMovieService, MockMovieService>();
         // TODO-BACKEND: MockCinemaService → ApiCinemaService
@@ -71,11 +66,5 @@ public partial class App : Application
         services.AddTransient<AuthViewModel>();
         services.AddTransient<MyTicketsViewModel>();
         services.AddTransient<BookingViewModel>();
-    }
-
-    protected override async void OnExit(ExitEventArgs e)
-    {
-        if (_host is not null) { await _host.StopAsync(); _host.Dispose(); }
-        base.OnExit(e);
     }
 }
