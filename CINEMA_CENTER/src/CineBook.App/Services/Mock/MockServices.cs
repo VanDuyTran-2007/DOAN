@@ -3,12 +3,8 @@ using CineBook.Services.Interfaces;
 
 namespace CineBook.Services.Mock;
 
-// Các Mock service: dữ liệu cứng + Task.Delay giả độ trễ mạng.
-// Backend team: viết ApiXxxService implement cùng interface rồi đổi đăng ký DI trong App.xaml.cs.
-
 internal static class Net
 {
-    /// <summary>Giả lập độ trễ mạng.</summary>
     public static Task Delay(CancellationToken ct, int ms = 450) => Task.Delay(ms, ct);
 }
 
@@ -39,7 +35,6 @@ public class MockMovieService : IMovieService
         IEnumerable<Movie> src = MockData.Movies;
         if (!string.IsNullOrEmpty(q.Genre)) src = src.Where(m => m.Genres.Contains(q.Genre));
         if (q.Status is { } st) src = src.Where(m => m.Status == st);
-        // Mock: lọc định dạng dựa trên việc phim có suất ở định dạng đó (đơn giản hoá: theo hash).
         if (q.Format is { } f) src = src.Where(m => (MockData.StableHash(m.Id) & 3) == (int)f || f == MovieFormat.TwoD);
         src = q.Sort == MovieSort.Rating ? src.OrderByDescending(m => m.Rating) : src.OrderByDescending(m => m.ReleaseDate);
         var all = src.ToList();
@@ -66,7 +61,6 @@ public class MockCinemaService : ICinemaService
     public async Task<IReadOnlyList<Cinema>> GetNearbyAsync(double lat, double lng, double radiusKm, CancellationToken ct = default)
     {
         await Net.Delay(ct, 800);
-        // NOTE-DB: server nên tính khoảng cách; mock tính Haversine để demo.
         foreach (var c in MockData.Cinemas) c.DistanceKm = Haversine(lat, lng, c.Latitude, c.Longitude);
         return MockData.Cinemas.Where(c => c.DistanceKm <= radiusKm).OrderBy(c => c.DistanceKm).ToList();
     }
@@ -104,24 +98,36 @@ public class MockShowtimeService : IShowtimeService
 public class MockSeatService : ISeatService
 {
     private static readonly string[] RowLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    private readonly Dictionary<string, HashSet<string>> _bookedByShowtime = [];
+
+    public void MarkAsBooked(string showtimeId, IEnumerable<string> seatIds)
+    {
+        if (!_bookedByShowtime.TryGetValue(showtimeId, out var set))
+        {
+            set = [];
+            _bookedByShowtime[showtimeId] = set;
+        }
+        foreach (var id in seatIds) set.Add(id);
+    }
 
     public async Task<SeatMap> GetSeatMapAsync(string showtimeId, CancellationToken ct = default)
     {
         await Net.Delay(ct, 500);
         var st = MockData.ParseShowtime(showtimeId) ?? throw new InvalidOperationException("Suất chiếu không tồn tại");
         var rnd = new Random(MockData.StableHash(showtimeId));
+        _bookedByShowtime.TryGetValue(showtimeId, out var bookedIds);
+
         var rows = new List<SeatRow>();
         foreach (var (label, idx) in RowLabels.Select((l, i) => (l, i)))
         {
             var seats = new List<Seat>();
             bool couple = idx == RowLabels.Length - 1;
             bool vip = idx is >= 5 and <= 7;
-            // Lưới 15 cột, cột 8 là lối đi giữa. Hàng cuối là ghế đôi (mỗi ghế rộng 2 cột).
             if (couple)
             {
                 int[] starts = [1, 3, 5, 9, 11, 13];
                 for (int n = 0; n < starts.Length; n++)
-                    seats.Add(Make(st, label, n + 1, SeatType.Couple, starts[n], 2, rnd));
+                    seats.Add(Make(st, label, n + 1, SeatType.Couple, starts[n], 2, rnd, bookedIds));
             }
             else
             {
@@ -129,9 +135,8 @@ public class MockSeatService : ISeatService
                 for (int col = 1; col <= 15; col++)
                 {
                     if (col == 8) continue;
-                    // Hàng A bỏ 2 ghế đầu hàng để minh hoạ khoảng trống.
                     if (idx == 0 && (col == 1 || col == 15)) continue;
-                    seats.Add(Make(st, label, num++, vip ? SeatType.Vip : SeatType.Standard, col, 1, rnd));
+                    seats.Add(Make(st, label, num++, vip ? SeatType.Vip : SeatType.Standard, col, 1, rnd, bookedIds));
                 }
             }
             rows.Add(new SeatRow { Label = label, Seats = seats });
@@ -139,16 +144,19 @@ public class MockSeatService : ISeatService
         return new SeatMap { ShowtimeId = showtimeId, AuditoriumName = st.AuditoriumName, TotalColumns = 15, Rows = rows };
     }
 
-    /// <summary>Giá ghế theo hàng (A-E thường, F-H VIP, J ghế đôi). Backend thật tính theo loại ghế/định dạng/ngày.</summary>
     public static decimal PriceFor(Showtime st, string seatLabel)
         => seatLabel[0] switch { 'J' => st.BasePrice * 2 + 10000, >= 'F' and <= 'H' => st.BasePrice + 25000, _ => st.BasePrice };
 
-    private static Seat Make(Showtime st, string row, int num, SeatType type, int col, int span, Random rnd)
+    private static Seat Make(Showtime st, string row, int num, SeatType type, int col, int span, Random rnd, HashSet<string>? bookedIds)
     {
         decimal price = PriceFor(st, row);
+        string seatId = $"{st.AuditoriumId}-{row}{num}";
         int roll = rnd.Next(100);
-        var status = roll < 22 ? SeatStatus.Booked : roll < 27 ? SeatStatus.Holding : roll < 29 ? SeatStatus.Unavailable : SeatStatus.Available;
-        return new Seat { Id = $"{st.AuditoriumId}-{row}{num}", Row = row, Number = num, Type = type, Status = status, Price = price, GridColumn = col, ColumnSpan = span };
+        var status = (bookedIds is not null && bookedIds.Contains(seatId))
+            ? SeatStatus.Booked
+            : roll < 22 ? SeatStatus.Booked : roll < 27 ? SeatStatus.Holding : roll < 29 ? SeatStatus.Unavailable : SeatStatus.Available;
+
+        return new Seat { Id = seatId, Row = row, Number = num, Type = type, Status = status, Price = price, GridColumn = col, ColumnSpan = span };
     }
 
     public async Task<SeatHold> HoldSeatsAsync(string showtimeId, IReadOnlyList<string> seatIds, CancellationToken ct = default)
@@ -168,10 +176,15 @@ public class MockAuthService : IAuthService
     public async Task<AuthResult> SignInAsync(string identity, string password, CancellationToken ct = default)
     {
         await Net.Delay(ct, 900);
-        // Mock: mật khẩu sai khi là "wrong-password" để demo trạng thái lỗi.
         if (password == "wrong-password") return new AuthResult(false, "Email/SĐT hoặc mật khẩu không đúng", null);
-        CurrentUser = new User { Id = "u1", FullName = "Nguyễn Văn An", Email = identity.Contains('@') ? identity : "an@example.com",
-                                 Phone = identity.Contains('@') ? "0900000000" : identity, MemberTier = MemberTier.Silver };
+        CurrentUser = new User
+        {
+            Id = "u1",
+            FullName = "Nguyễn Văn An",
+            Email = identity.Contains('@') ? identity : "an@example.com",
+            Phone = identity.Contains('@') ? "0900000000" : identity,
+            MemberTier = MemberTier.Silver
+        };
         AuthStateChanged?.Invoke(this, EventArgs.Empty);
         return new AuthResult(true, null, CurrentUser);
     }
@@ -195,9 +208,15 @@ public class MockAuthService : IAuthService
 public class MockBookingService : IBookingService
 {
     private readonly List<Booking> _mine = [];
-    private readonly Dictionary<string, Booking> _pending = [];
+    private readonly Dictionary<string, (Booking Booking, string ShowtimeId, IReadOnlyList<string> SeatIds)> _pending = [];
     private readonly IShowtimeService _showtimes;
-    public MockBookingService(IShowtimeService showtimes) => _showtimes = showtimes;
+    private readonly ISeatService _seats;
+
+    public MockBookingService(IShowtimeService showtimes, ISeatService seats)
+    {
+        _showtimes = showtimes;
+        _seats = seats;
+    }
 
     public async Task<IReadOnlyList<Combo>> GetCombosAsync(CancellationToken ct = default)
     { await Net.Delay(ct, 350); return MockData.Combos; }
@@ -208,37 +227,54 @@ public class MockBookingService : IBookingService
         var st = await _showtimes.GetByIdAsync(r.ShowtimeId, ct) ?? throw new InvalidOperationException("Suất chiếu không tồn tại");
         var movie = MockData.Movies.First(m => m.Id == st.MovieId);
         var cinema = MockData.Cinemas.First(c => c.Id == st.CinemaId);
-        // Mock: không có giá thật ở đây; ước lượng từ BasePrice. Backend phải tính lại.
         decimal total = r.SeatIds.Sum(id => MockSeatService.PriceFor(st, id[(id.LastIndexOf('-') + 1)..]))
                       + r.Combos.Sum(kv => MockData.Combos.First(c => c.Id == kv.Key).Price * kv.Value);
         var booking = new Booking
         {
-            Id = Guid.NewGuid().ToString("N"), Code = "CB" + Random.Shared.Next(100000, 999999),
-            MovieTitle = movie.Title, CinemaName = cinema.Name, AuditoriumName = st.AuditoriumName, StartTime = st.StartTime,
-            SeatLabels = r.SeatIds.Select(s => s[(s.LastIndexOf('-') + 1)..]).ToList(), TotalAmount = total, Status = BookingStatus.Pending
+            Id = Guid.NewGuid().ToString("N"),
+            Code = "CB" + Random.Shared.Next(100000, 999999),
+            MovieTitle = movie.Title,
+            CinemaName = cinema.Name,
+            AuditoriumName = st.AuditoriumName,
+            StartTime = st.StartTime,
+            SeatLabels = r.SeatIds.Select(s => s[(s.LastIndexOf('-') + 1)..]).ToList(),
+            TotalAmount = total,
+            Status = BookingStatus.Pending
         };
-        _pending[booking.Id] = booking;
+        _pending[booking.Id] = (booking, r.ShowtimeId, r.SeatIds);
         return booking;
     }
 
     public async Task<PaymentResult> ConfirmPaymentAsync(string bookingId, PaymentMethod method, CancellationToken ct = default)
     {
-        await Net.Delay(ct, 2000); // giả 2 giây chờ cổng thanh toán
-        if (!_pending.TryGetValue(bookingId, out var b)) return new PaymentResult(false, "Đơn đặt vé không tồn tại hoặc đã hết hạn", null);
+        await Net.Delay(ct, 2000);
+        if (!_pending.TryGetValue(bookingId, out var entry)) return new PaymentResult(false, "Đơn đặt vé không tồn tại hoặc đã hết hạn", null);
+        var (b, showtimeId, seatIds) = entry;
+
         var paid = new Booking
         {
-            Id = b.Id, Code = b.Code, MovieTitle = b.MovieTitle, CinemaName = b.CinemaName, AuditoriumName = b.AuditoriumName,
-            StartTime = b.StartTime, SeatLabels = b.SeatLabels, TotalAmount = b.TotalAmount, Status = BookingStatus.Paid
+            Id = b.Id,
+            Code = b.Code,
+            MovieTitle = b.MovieTitle,
+            CinemaName = b.CinemaName,
+            AuditoriumName = b.AuditoriumName,
+            StartTime = b.StartTime,
+            SeatLabels = b.SeatLabels,
+            TotalAmount = b.TotalAmount,
+            Status = BookingStatus.Paid
         };
         _pending.Remove(bookingId);
         _mine.Insert(0, paid);
+
+        if (_seats is MockSeatService mockSeats)
+            mockSeats.MarkAsBooked(showtimeId, seatIds);
+
         return new PaymentResult(true, null, paid);
     }
 
     public async Task<IReadOnlyList<Booking>> GetMyTicketsAsync(CancellationToken ct = default)
     { await Net.Delay(ct, 400); return _mine; }
 
-    /// <summary>Chỉ mock: lưu vé đã thanh toán để trang "Vé của tôi" hiển thị.</summary>
     public void AddPaid(Booking b) => _mine.Add(b);
 }
 
@@ -249,7 +285,6 @@ public class MockLocationService : ILocationService
     public async Task<GeoLocation?> GetCurrentLocationAsync(CancellationToken ct = default)
     {
         await Net.Delay(ct, 600);
-        // Mock: luôn trả toạ độ TP.HCM. Thực tế: dùng Windows.Devices.Geolocation; trả null nếu bị từ chối.
         return MockData.Cities[0];
     }
 }
