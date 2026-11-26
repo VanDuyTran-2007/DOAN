@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Apps/">
+    <Project Path="../VILLA_DHQG/VILLA_DHQG.csproj" />
+    <Project Path="../CINEMA_CENTER/src/CineBook.App/CineBook.App.csproj" />
+  </Folder>
+  <Folder Name="/Tai lieu/">
+    <File Path="../README.md" />
+    <File Path="../agent.md" />
+    <File Path="../.gitignore" />
+  </Folder>
+</Solution>

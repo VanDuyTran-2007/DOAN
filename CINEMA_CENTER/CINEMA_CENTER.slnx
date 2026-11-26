@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="docs/BACKEND_NOTES.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="src/CineBook.App/CineBook.App.csproj" />
+</Solution>

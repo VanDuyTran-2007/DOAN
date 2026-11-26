@@ -1,0 +1,10 @@
+<UserControl x:Class="CineBook.Controls.PosterView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Poster: DataContext = Movie. Chưa có ảnh thật → gradient + tên phim (Viewbox tự thu nhỏ chữ cho vừa poster nhỏ) -->
+    <Border CornerRadius="8" Background="{Binding Converter={StaticResource PosterBrush}}">
+        <Viewbox StretchDirection="DownOnly" Margin="8" Visibility="{Binding PosterUrl, Converter={StaticResource NullToVisible}}">
+            <TextBlock Text="{Binding Title}" Width="150" FontSize="18" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center" />
+        </Viewbox>
+    </Border>
+</UserControl>
