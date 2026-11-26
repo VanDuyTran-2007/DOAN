@@ -1,0 +1,57 @@
+<UserControl x:Class="CineBook.Controls.BrandLogo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root" HorizontalAlignment="Left">
+    <!-- Cinema brand logo with no background. The Cinestar PNG has its black lettering recolored to near-white so it reads on the navy UI.
+         Chosen by BrandId; unknown brands fall back to the brand name as text.
+         Lotte and BHD are vector paths; CGV and Cinestar are PNG resources in Assets/Brands. -->
+    <UserControl.Resources>
+        <Style x:Key="ShowFor" TargetType="FrameworkElement">
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="Height" Value="22" />
+        </Style>
+
+        <Style x:Key="LogoCgv" TargetType="Image" BasedOn="{StaticResource ShowFor}">
+            <Style.Triggers><DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="cgv"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+        </Style>
+        <Style x:Key="LogoCinestar" TargetType="Image" BasedOn="{StaticResource ShowFor}">
+            <Style.Triggers><DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="cinestar"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+        </Style>
+        <Style x:Key="LogoLotte" TargetType="Path" BasedOn="{StaticResource ShowFor}">
+            <Style.Triggers><DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="lotte"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+        </Style>
+        <Style x:Key="LogoBhd" TargetType="Path" BasedOn="{StaticResource ShowFor}">
+            <Style.Triggers><DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="bhd"><Setter Property="Visibility" Value="Visible" /></DataTrigger></Style.Triggers>
+        </Style>
+
+        <!-- Fallback text: hidden when a known logo is shown -->
+        <Style x:Key="LogoFallback" TargetType="TextBlock" BasedOn="{StaticResource TextBase}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="cgv"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                <DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="cinestar"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                <DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="lotte"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+                <DataTrigger Binding="{Binding BrandId, ElementName=Root}" Value="bhd"><Setter Property="Visibility" Value="Collapsed" /></DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="Transparent" ToolTip="{Binding BrandName, ElementName=Root}">
+        <Grid>
+            <Image Style="{StaticResource LogoCgv}" Source="/Assets/Brands/cgv.png" Stretch="Uniform" />
+            <Image Style="{StaticResource LogoCinestar}" Source="/Assets/Brands/cinestar.png" Stretch="Uniform" />
+
+            <!-- Lotte (vector, from the supplied SVG) -->
+            <Path Style="{StaticResource LogoLotte}" Fill="#E60012" Stretch="Uniform"
+                  Data="F1 M61.757,0C46.075,0,36.682,9.578,36.682,21.42c0,11.824,9.393,21.406,25.075,21.406c15.677,0,25.084-9.582,25.084-21.406C86.841,9.578,77.435,0,61.757,0 M61.757,38.23c-7.519,0-13.231-7.541-13.231-16.811c0-9.311,5.712-16.838,13.231-16.838c7.522,0,13.232,7.527,13.232,16.838C74.989,30.689,69.279,38.23,61.757,38.23 M132.061,1.479 L88.978,1.479 L88.978,6.287 L105.478,6.287 L105.478,41.094 L117.926,41.094 L117.926,6.287 L132.061,6.287 Z M179.267,1.479 L136.186,1.479 L136.186,6.287 L150.314,6.287 L150.314,41.094 L162.737,41.094 L162.737,6.287 L179.267,6.287 Z M14.305,36.336c-1.311,0-2.376-1.057-2.376-2.363V1.482H0v34.877c0,2.6,2.119,4.701,4.748,4.701h30.505v-4.725H14.305z M198.347,6.211h22.972V1.479h-32.538c-2.622,0-4.757,2.186-4.757,4.762v30.121c0,2.598,2.135,4.699,4.757,4.699h32.538v-4.672h-22.972c-1.305,0-2.375-1.045-2.375-2.352V22.373h24.992v-4.621h-24.992V8.568C195.972,7.275,197.042,6.211,198.347,6.211" />
+
+            <!-- BHD Star (vector, from the supplied SVG) -->
+            <Path Style="{StaticResource LogoBhd}" Fill="#8EDB1D" Stretch="Uniform"
+                  Data="F1 m 43.025457,0.43917829 c -0.105751,2.3689e-4 -0.16179,0.002105 -0.16179,0.002105 H 1.0251431 V 159.55519 H 42.863667 c 20.666098,0 31.361082,-19.00453 31.216594,-45.09005 0,0 2.384489,-34.684206 -18.426169,-39.670127 0,0 8.270579,-1.316876 12.711765,-14.98805 C 70.146697,54.325107 70.766663,47.221109 70.8287,36.859692 70.906765,23.815405 68.564194,15.009729 64.424484,9.6361921 57.52538,0.68079544 44.612612,0.43458162 43.025457,0.43891785 Z M 89.9042,0.44128329 V 159.55519 h 27.53134 V 91.920117 h 16.04195 v 67.635073 h 27.52908 V 0.44098596 H 133.47749 V 59.838258 H 117.43554 V 0.44098596 Z m 88.44538,0 V 159.55519 h 42.92163 c 0,0 29.04692,8e-5 28.83017,-39.67011 l 0.21784,-78.257079 c 0,0 0.8662,-16.325793 -5.7503,-28.335772 C 240.46027,5.8342855 232.93443,0.44116491 222.13852,0.44116491 Z M 29.423837,27.320817 h 5.069426 c 9.104616,0 9.453537,6.501157 9.453537,20.376577 0,15.174585 -6.936825,15.392527 -6.936825,15.392527 h -7.586138 z m 176.672793,0 h 5.86713 c 10.10934,0 10.10967,10.60399 10.10967,10.60399 v 81.780533 c 0,12.82535 -8.60184,12.75223 -8.60184,12.75223 h -7.37496 z M 29.423837,88.886515 h 6.718776 c 6.720139,0 9.538904,4.983365 9.538904,24.711265 0,6.86841 -0.774449,11.45193 -2.310018,14.22854 -2.680866,4.84728 -6.795194,4.63125 -6.795194,4.63125 h -7.152468 z" />
+
+            <TextBlock Style="{StaticResource LogoFallback}" Text="{Binding BrandName, ElementName=Root}" VerticalAlignment="Center" />
+        </Grid>
+    </Border>
+</UserControl>

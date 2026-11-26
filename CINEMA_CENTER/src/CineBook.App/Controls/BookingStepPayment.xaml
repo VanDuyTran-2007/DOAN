@@ -16,7 +16,7 @@
                         <Border x:Name="Bd" Padding="16,14" CornerRadius="8" BorderThickness="1.5" BorderBrush="{StaticResource NavyBorder}" Background="{StaticResource NavySurface}">
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <Border Width="44" Height="44" CornerRadius="10" Background="{StaticResource BrandGradient}">
+                                <Border Width="44" Height="44" CornerRadius="8" Background="{StaticResource NavyBorder}">
                                     <TextBlock Text="{Binding Name, Converter={StaticResource FirstLetter}}" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
                                 <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">

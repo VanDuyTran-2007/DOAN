@@ -32,14 +32,12 @@
 
                     <StackPanel Orientation="Horizontal" Margin="64,64,64,32" VerticalAlignment="Bottom">
                         <ctl:PosterView DataContext="{Binding Movie}" Width="220" Height="330" VerticalAlignment="Bottom">
-                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="36" ShadowDepth="8" Opacity="0.7" /></ctl:PosterView.Effect>
+                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.4" /></ctl:PosterView.Effect>
                         </ctl:PosterView>
 
                         <StackPanel Margin="36,0,0,0" MaxWidth="760" VerticalAlignment="Bottom">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                <Border Padding="9,3" CornerRadius="999" Background="{Binding Movie.AgeRating, Converter={StaticResource AgeBrush}}" Margin="0,0,8,0">
-                                    <TextBlock Text="{Binding Movie.AgeRating}" FontSize="12" FontWeight="Bold" />
-                                </Border>
+                                <ctl:AgeBadge Code="{Binding Movie.AgeRating}" Margin="0,0,8,0" VerticalAlignment="Center" />
                                 <Border Padding="9,3" CornerRadius="999" Background="{StaticResource AccentGold}" Visibility="{Binding Movie.IsHot, Converter={StaticResource BoolToVis}}">
                                     <TextBlock Text="HOT" FontSize="12" FontWeight="ExtraBold" Foreground="{StaticResource NavyDarkest}" />
                                 </Border>
@@ -62,7 +60,12 @@
                                 <Run Text="Diễn viên: " FontWeight="SemiBold" /><Run Text="{Binding Movie.CastText, Mode=OneWay}" />
                             </TextBlock>
                             <StackPanel Orientation="Horizontal" Margin="0,18,0,0">
-                                <Button Content="▶  Xem trailer" Style="{StaticResource CtaButton}" Command="{Binding WatchTrailerCommand}" Margin="0,0,10,0" />
+                                <Button Style="{StaticResource CtaButton}" Command="{Binding WatchTrailerCommand}" Margin="0,0,10,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconPlay}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" />
+                                        <TextBlock Text="Xem trailer" />
+                                    </StackPanel>
+                                </Button>
                                 <Button Content="Nhắc tôi" Style="{StaticResource SecondaryButton}" Padding="22,13" Command="{Binding RemindCommand}"
                                         Visibility="{Binding IsComingSoon, Converter={StaticResource BoolToVis}}" />
                             </StackPanel>

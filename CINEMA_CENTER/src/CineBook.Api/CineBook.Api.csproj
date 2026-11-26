@@ -1,29 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+
   <PropertyGroup>
-    <AssemblyName>CineBook.Api</AssemblyName>
-    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>CineBook.Api</AssemblyName>
+    <RootNamespace>CineBook.Api</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup>
-    <LangVersion>14.0</LangVersion>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-  </PropertyGroup>
-  <PropertyGroup />
-  <ItemGroup />
+
   <ItemGroup>
-    <Reference Include="Microsoft.EntityFrameworkCore">
-      <HintPath>bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.AspNetCore.OpenApi">
-      <HintPath>bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.OpenApi">
-      <HintPath>bin\Debug\net10.0\Microsoft.OpenApi.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.SqlServer">
-      <HintPath>bin\Debug\net10.0\Microsoft.EntityFrameworkCore.SqlServer.dll</HintPath>
-    </Reference>
+    <!-- Cac file sinh tu decompiler / source generator, khong thuoc ma nguon that -->
+    <Compile Remove="Microsoft.AspNetCore.OpenApi.Generated/**" />
+    <Compile Remove="System.Runtime.CompilerServices/**" />
+    <Compile Remove="Properties/AssemblyInfo.cs" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+  </ItemGroup>
+
 </Project>

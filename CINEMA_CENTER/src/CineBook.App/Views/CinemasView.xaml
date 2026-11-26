@@ -11,9 +11,7 @@
                 <Border Style="{StaticResource CardBorder}" Padding="14,12" Background="{StaticResource NavySurface}">
                     <StackPanel>
                         <Grid>
-                            <Border HorizontalAlignment="Left" Padding="8,2" CornerRadius="999" Background="{Binding Brand.ThemeColorHex, Converter={StaticResource HexToBrush}}">
-                                <TextBlock Text="{Binding Brand.Name}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
-                            </Border>
+                            <ctl:BrandLogo BrandId="{Binding Brand.Id}" BrandName="{Binding Brand.Name}" />
                         </Grid>
                         <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="15" Margin="0,8,0,2" Foreground="{StaticResource TextPrimary}" TextWrapping="Wrap" />
                         <TextBlock Text="{Binding Address}" Style="{StaticResource TextCaption}" TextWrapping="Wrap" />

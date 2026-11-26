@@ -53,27 +53,30 @@
                         </Rectangle>
 
                         <ctl:PosterView Width="230" Height="345" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,120,20">
-                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.7" /></ctl:PosterView.Effect>
+                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="4" Opacity="0.4" /></ctl:PosterView.Effect>
                         </ctl:PosterView>
                         <StackPanel VerticalAlignment="Center" Margin="64,0,0,20" MaxWidth="560" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <Border Padding="9,3" CornerRadius="999" Background="{StaticResource AccentGold}" Margin="0,0,8,0">
                                     <TextBlock Text="HOT" FontSize="12" FontWeight="ExtraBold" Foreground="{StaticResource NavyDarkest}" />
                                 </Border>
-                                <Border Padding="9,3" CornerRadius="999" Background="{Binding AgeRating, Converter={StaticResource AgeBrush}}">
-                                    <TextBlock Text="{Binding AgeRating}" FontSize="12" FontWeight="Bold" />
-                                </Border>
+                                <ctl:AgeBadge Code="{Binding AgeRating}" VerticalAlignment="Center" />
                             </StackPanel>
                             <TextBlock Text="{Binding Title}" FontSize="44" FontWeight="ExtraBold" TextWrapping="Wrap" />
                             <TextBlock Margin="0,8,0,0" Style="{StaticResource TextSecondaryBody}">
-                                <Run Text="{Binding GenresText, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{Binding DurationText, Mode=OneWay}" /><Run Text="  ·  ★ " /><Run Text="{Binding RatingText, Mode=OneWay}" />
+                                <Run Text="{Binding GenresText, Mode=OneWay}" /><Run Text="  ·  " /><Run Text="{Binding DurationText, Mode=OneWay}" /><Run Text="  ·  Đánh giá " /><Run Text="{Binding RatingText, Mode=OneWay}" />
                             </TextBlock>
                             <TextBlock Text="{Binding Description}" Margin="0,12,0,0" Style="{StaticResource TextBody}" MaxHeight="44" TextTrimming="CharacterEllipsis" />
                             <StackPanel Orientation="Horizontal" Margin="0,22,0,0">
                                 <Button Content="Đặt vé ngay" Style="{StaticResource CtaButton}" Margin="0,0,12,0"
                                         Command="{Binding DataContext.OpenMovieCommand, ElementName=Root}" CommandParameter="{Binding}" />
-                                <Button Content="▶  Xem trailer" Style="{StaticResource SecondaryButton}" Padding="22,13"
-                                        Command="{Binding DataContext.WatchTrailerCommand, ElementName=Root}" CommandParameter="{Binding}" />
+                                <Button Style="{StaticResource SecondaryButton}" Padding="22,13"
+                                        Command="{Binding DataContext.WatchTrailerCommand, ElementName=Root}" CommandParameter="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconPlay}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" />
+                                        <TextBlock Text="Xem trailer" />
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
                         </StackPanel>
                     </Grid>

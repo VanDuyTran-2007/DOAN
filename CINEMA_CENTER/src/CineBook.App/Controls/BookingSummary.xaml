@@ -9,9 +9,7 @@
                 <ctl:PosterView DataContext="{Binding Movie}" Width="72" Height="108" VerticalAlignment="Top" />
                 <StackPanel Margin="14,0,0,0" MaxWidth="200">
                     <TextBlock Text="{Binding Movie.Title}" Style="{StaticResource TextH3}" TextWrapping="Wrap" />
-                    <Border Padding="8,2" CornerRadius="999" HorizontalAlignment="Left" Margin="0,6,0,0" Background="{Binding Movie.AgeRating, Converter={StaticResource AgeBrush}}">
-                        <TextBlock Text="{Binding Movie.AgeRating}" FontSize="11" FontWeight="Bold" />
-                    </Border>
+                    <ctl:AgeBadge Code="{Binding Movie.AgeRating}" HorizontalAlignment="Left" Margin="0,6,0,0" />
                     <TextBlock Text="{Binding Showtime.FormatText}" Style="{StaticResource TextCaption}" Margin="0,6,0,0" />
                 </StackPanel>
             </StackPanel>

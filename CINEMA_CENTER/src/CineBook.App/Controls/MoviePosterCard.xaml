@@ -10,7 +10,7 @@
             <Setter Property="Cursor" Value="Hand" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="24" ShadowDepth="6" Opacity="0.6" /></Setter.Value></Setter>
+                    <Setter Property="Effect"><Setter.Value><DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.45" /></Setter.Value></Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -24,8 +24,8 @@
             <EventTrigger RoutedEvent="MouseEnter">
                 <BeginStoryboard><Storyboard>
                     <DoubleAnimation Storyboard.TargetName="Overlay" Storyboard.TargetProperty="Opacity" To="1" Duration="0:0:0.15" />
-                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1.05" Duration="0:0:0.15" />
-                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1.05" Duration="0:0:0.15" />
+                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleX" To="1.03" Duration="0:0:0.15" />
+                    <DoubleAnimation Storyboard.TargetName="Scale" Storyboard.TargetProperty="ScaleY" To="1.03" Duration="0:0:0.15" />
                 </Storyboard></BeginStoryboard>
             </EventTrigger>
             <EventTrigger RoutedEvent="MouseLeave">
@@ -42,10 +42,7 @@
                 <ctl:PosterView />
 
                 <!-- Nhãn tuổi (góc trên trái) -->
-                <Border HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" Padding="7,2" CornerRadius="999"
-                        Background="{Binding AgeRating, Converter={StaticResource AgeBrush}}">
-                    <TextBlock Text="{Binding AgeRating}" FontSize="11" FontWeight="Bold" />
-                </Border>
+                <ctl:AgeBadge Code="{Binding AgeRating}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="8" />
 
                 <!-- Badge HOT -->
                 <Border HorizontalAlignment="Right" VerticalAlignment="Top" Margin="8" Padding="8,2" CornerRadius="999"
@@ -54,13 +51,8 @@
                 </Border>
 
                 <!-- Rating (góc dưới trái) -->
-                <Border HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8" Padding="7,3" CornerRadius="999"
-                        Background="{StaticResource ScrimBrush}" Visibility="{Binding HasRating, Converter={StaticResource BoolToVis}}">
-                    <StackPanel Orientation="Horizontal">
-                        <Path Data="{StaticResource IconStar}" Fill="{StaticResource AccentGold}" Width="12" Height="12" Stretch="Uniform" Margin="0,0,4,0" />
-                        <TextBlock Text="{Binding RatingText}" FontSize="12" FontWeight="SemiBold" />
-                    </StackPanel>
-                </Border>
+                <ctl:RatingBadge Score="{Binding Rating}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="8"
+                                 Visibility="{Binding HasRating, Converter={StaticResource BoolToVis}}" />
 
                 <!-- Lớp phủ hiện khi hover: nút hành động -->
                 <Border x:Name="Overlay" Opacity="0" CornerRadius="8" Background="{StaticResource ScrimBrush}">
@@ -72,7 +64,7 @@
                 </Border>
             </Grid>
 
-            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis" Margin="2,10,2,0" />
+            <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis" Margin="2,12,2,0" />
             <TextBlock Text="{Binding GenresText}" Style="{StaticResource TextCaption}" TextTrimming="CharacterEllipsis" Margin="2,2,2,0" />
             <!-- Phim sắp chiếu: hiện ngày khởi chiếu -->
             <TextBlock x:Name="ReleaseText" Style="{StaticResource TextCaption}" Foreground="{StaticResource AccentGold}" Margin="2,2,2,0" Visibility="Collapsed" />

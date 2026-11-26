@@ -12,7 +12,7 @@
     <Color x:Key="AccentGoldColor">#D4A84B</Color>
     <Color x:Key="TextPrimaryColor">#F5F5F7</Color>
     <Color x:Key="TextSecondaryColor">#A9B4C8</Color>
-    <Color x:Key="TextMutedColor">#6B7A96</Color>
+    <Color x:Key="TextMutedColor">#8795B0</Color>
     <Color x:Key="SuccessColor">#2FB67C</Color>
     <Color x:Key="ErrorColor">#E5484D</Color>
 
@@ -36,10 +36,8 @@
     <SolidColorBrush x:Key="ScrimBrush" Color="#000000" Opacity="0.55" />
 
     <!-- Gradient đặc trưng: Burgundy → NavyDark theo đường chéo (banner, nút CTA lớn) -->
-    <LinearGradientBrush x:Key="BrandGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="{StaticResource BurgundyColor}" Offset="0" />
-        <GradientStop Color="{StaticResource NavyDarkColor}" Offset="1" />
-    </LinearGradientBrush>
+    <!-- Giữ tên key cũ để các control không vỡ; nay là màu đặc, không còn gradient -->
+    <SolidColorBrush x:Key="BrandGradient" Color="{StaticResource BurgundyColor}" />
 
     <!-- Bo góc thống nhất -->
     <CornerRadius x:Key="RadiusCard">8</CornerRadius>

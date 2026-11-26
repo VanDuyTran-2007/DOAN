@@ -59,14 +59,10 @@
 
             <!-- Logo chữ + gradient -->
             <Button Grid.Column="0" Style="{StaticResource GhostButton}" Command="{Binding GoHomeCommand}" Padding="4,0" VerticalAlignment="Center">
-                <TextBlock Text="CineBook" FontSize="26" FontWeight="ExtraBold">
-                    <TextBlock.Foreground>
-                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                            <GradientStop Color="{StaticResource BurgundyHoverColor}" Offset="0" />
-                            <GradientStop Color="{StaticResource AccentGoldColor}" Offset="1" />
-                        </LinearGradientBrush>
-                    </TextBlock.Foreground>
-                </TextBlock>
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="{StaticResource IconTicket}" Fill="{StaticResource Burgundy}" Width="22" Height="22" Stretch="Uniform" Margin="0,0,8,0" VerticalAlignment="Center" />
+                    <TextBlock Text="CineBook" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
             </Button>
 
             <!-- Menu giữa -->
@@ -75,8 +71,13 @@
                         Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Booking}" />
                 <Button Content="Rạp chiếu" Style="{StaticResource MenuButton}" Command="{Binding GoCinemasCommand}"
                         Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Cinemas}" />
-                <Button x:Name="CategoryButton" Content="Danh mục ▾" Style="{StaticResource MenuButton}" Command="{Binding ToggleCategoryCommand}"
-                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Categories}" />
+                <Button x:Name="CategoryButton" Style="{StaticResource MenuButton}" Command="{Binding ToggleCategoryCommand}"
+                        Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Categories}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Danh mục" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}" />
+                        <Path Data="{StaticResource IconChevronDown}" Fill="{StaticResource TextSecondary}" Width="16" Height="16" Stretch="Uniform" Margin="2,1,0,0" />
+                    </StackPanel>
+                </Button>
                 <Button Content="Phim" Style="{StaticResource MenuButton}" Command="{Binding GoMoviesCommand}"
                         Tag="{Binding ActiveMenu, Converter={StaticResource Equals}, ConverterParameter=Movies}" />
 
@@ -146,7 +147,7 @@
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsSignedIn, Converter={StaticResource BoolToVis}}">
                     <Button x:Name="AvatarButton" Style="{StaticResource GhostButton}" Command="{Binding ToggleUserMenuCommand}" Padding="4">
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="34" Height="34" CornerRadius="17" Background="{StaticResource BrandGradient}">
+                            <Border Width="34" Height="34" CornerRadius="17" Background="{StaticResource Burgundy}">
                                 <TextBlock Text="{Binding CurrentUser.Initials}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
                             </Border>
                             <TextBlock Text="{Binding CurrentUser.FullName}" VerticalAlignment="Center" Margin="8,0,2,0" Foreground="{StaticResource TextPrimary}" />

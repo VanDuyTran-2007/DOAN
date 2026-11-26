@@ -7,29 +7,12 @@
 
         <!-- LỚP NỀN: collage poster trôi chậm + gradient navy phủ (đây là "Visual" nguồn cho hiệu ứng kính mờ) -->
         <Grid x:Name="BackgroundLayer">
-            <ctl:PosterWall Movies="{Binding WallMovies}" />
-            <Rectangle>
-                <Rectangle.Fill>
-                    <!-- Navy đặc ở bên phải (chỗ panel) → trong suốt dần sang trái -->
-                    <LinearGradientBrush StartPoint="1,0.5" EndPoint="0,0.5">
-                        <GradientStop Color="#F2070F1F" Offset="0" />
-                        <GradientStop Color="#CC070F1F" Offset="0.55" />
-                        <GradientStop Color="#B3070F1F" Offset="1" />
-                    </LinearGradientBrush>
-                </Rectangle.Fill>
-            </Rectangle>
+            <!-- Nền phẳng: không còn collage poster trôi và gradient phủ -->
         </Grid>
 
         <!-- Slogan bên trái -->
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="90,0,0,0" MaxWidth="520">
-            <TextBlock Text="CineBook" FontSize="56" FontWeight="ExtraBold">
-                <TextBlock.Foreground>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="{StaticResource BurgundyHoverColor}" Offset="0" />
-                        <GradientStop Color="{StaticResource AccentGoldColor}" Offset="1" />
-                    </LinearGradientBrush>
-                </TextBlock.Foreground>
-            </TextBlock>
+            <TextBlock Text="CineBook" FontSize="48" FontWeight="SemiBold" />
             <TextBlock Text="Đặt vé xem phim nhanh chóng tại mọi hệ thống rạp: CGV, Lotte, BHD Star, Cinestar."
                        Style="{StaticResource TextH3}" Foreground="{StaticResource TextSecondary}" FontWeight="Normal" TextWrapping="Wrap" Margin="0,10,0,0" />
         </StackPanel>
@@ -50,10 +33,8 @@
              3) Phủ lên trên: nền #0B1A33 opacity 0.55 + viền trắng 1px opacity 0.15. -->
         <Grid x:Name="GlassPanel" Width="420" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,90,40"
               SizeChanged="OnLayoutChanged">
-            <Border x:Name="BlurLayer" Margin="-40">
-                <Border.Effect><BlurEffect Radius="30" KernelType="Gaussian" /></Border.Effect>
-            </Border>
-            <Border Background="{StaticResource GlassFill}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" CornerRadius="16" />
+            <Border x:Name="BlurLayer" Margin="-40" Visibility="Collapsed" />
+            <Border Background="{StaticResource NavyDark}" BorderBrush="{StaticResource NavyBorder}" BorderThickness="1" CornerRadius="16" />
 
             <StackPanel Margin="28,24,28,24">
                 <TabControl x:Name="Tabs" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" SelectionChanged="OnTabChanged">

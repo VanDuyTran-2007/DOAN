@@ -15,8 +15,8 @@
                                 <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <!-- Ảnh placeholder -->
-                            <Border Width="72" Height="72" CornerRadius="8" Background="{StaticResource BrandGradient}">
-                                <TextBlock Text="🍿" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <Border Width="72" Height="72" CornerRadius="8" Background="{StaticResource NavyBorder}">
+                                <Path Data="{StaticResource IconTicket}" Fill="{StaticResource TextSecondary}" Width="28" Height="28" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                             <StackPanel Grid.Column="1" Margin="16,0" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Combo.Name}" Style="{StaticResource TextH3}" />

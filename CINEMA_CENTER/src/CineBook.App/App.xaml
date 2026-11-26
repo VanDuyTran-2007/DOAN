@@ -25,6 +25,8 @@
             <conv:HexToBrushConverter x:Key="HexToBrush" />
             <conv:MoneyConverter x:Key="Money" />
             <conv:AgeRatingBrushConverter x:Key="AgeBrush" />
+            <conv:ScoreTextConverter x:Key="ScoreText" />
+            <conv:RepeatTextConverter x:Key="RepeatText" />
             <conv:CountToVisibilityConverter x:Key="CountToVis" />
             <conv:PosterBrushConverter x:Key="PosterBrush" />
             <conv:BackdropBrushConverter x:Key="BackdropBrush" />
