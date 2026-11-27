@@ -8,6 +8,7 @@ namespace CineBook.Services;
 public partial class AppState : ObservableObject
 {
     [ObservableProperty] private GeoLocation? _selectedCity;
+    public GeoLocation? PreferredCity { get; set; }
 }
 
 public enum ToastKind { Info, Success, Error }

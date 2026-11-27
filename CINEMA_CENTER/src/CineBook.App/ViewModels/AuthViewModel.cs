@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Globalization;
 using CineBook.Models;
 using CineBook.Navigation;
@@ -20,12 +19,20 @@ public partial class AuthViewModel : ViewModelBase
     public AuthViewModel(IAuthService auth, INavigationService nav, IToastService toast, IMovieService movies)
     {
         _auth = auth; _nav = nav; _toast = toast; _movies = movies;
+        SignIn.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SignIn.CanSubmit)) SignInCommand.NotifyCanExecuteChanged();
+        };
+        SignUp.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SignUp.CanSubmit)) SignUpCommand.NotifyCanExecuteChanged();
+        };
     }
 
     public SignInFormViewModel SignIn { get; } = new();
     public SignUpFormViewModel SignUp { get; } = new();
     /// <summary>Phim dùng cho collage nền.</summary>
-    public ObservableCollection<Movie> WallMovies { get; } = [];
+    [ObservableProperty] private IReadOnlyList<Movie> _wallMovies = [];
 
     [ObservableProperty] private int _selectedTab;
     [ObservableProperty] private string? _serverError;
@@ -33,13 +40,16 @@ public partial class AuthViewModel : ViewModelBase
     public override async Task OnNavigatedToAsync(object? parameter)
     {
         SelectedTab = parameter is AuthTab.SignUp ? 1 : 0;
-        try { foreach (var m in await _movies.GetNowShowingAsync()) WallMovies.Add(m); }
+        try { WallMovies = await _movies.GetNowShowingAsync(); }
         catch { /* Không có phim: nền chỉ còn gradient */ }
     }
 
     partial void OnSelectedTabChanged(int value) => ServerError = null;
 
-    [RelayCommand]
+    private bool CanSignIn() => SignIn.CanSubmit;
+    private bool CanSignUp() => SignUp.CanSubmit;
+
+    [RelayCommand(CanExecute = nameof(CanSignIn))]
     private async Task SignInAsync()
     {
         ServerError = null;
@@ -56,7 +66,7 @@ public partial class AuthViewModel : ViewModelBase
         finally { IsBusy = false; }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanSignUp))]
     private async Task SignUpAsync()
     {
         ServerError = null;

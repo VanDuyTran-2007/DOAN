@@ -24,7 +24,7 @@ public enum SeatStatus
     Unavailable
 }
 
-public enum MemberTier { Standard, Silver, Gold, Platinum }
+public enum MemberTier { Standard, Silver, Gold, Platinum, Vip, Admin, Owner }
 
 public enum BookingStatus { Pending, Paid, Failed, Expired, Refunded }
 

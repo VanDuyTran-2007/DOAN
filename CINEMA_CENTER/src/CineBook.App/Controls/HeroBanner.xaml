@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctl="clr-namespace:CineBook.Controls"
              x:Name="Root" Height="440">
-    <!-- DataContext = HomeViewModel. Carousel phim hot: backdrop + gradient phủ + nút hành động -->
+    <!-- DataContext = HomeViewModel. -->
     <UserControl.Resources>
         <!-- Chấm điều hướng: chấm đang chọn dài ra thành pill burgundy -->
         <Style x:Key="DotButton" TargetType="Button">
@@ -23,23 +23,15 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </UserControl.Resources>
-
-    <Grid>
-        <!-- Loading: khung xương cho tới khi có phim -->
-        <ctl:SkeletonBox />
-
-        <ctl:TransitionContentControl Content="{Binding CurrentHero}">
-            <ctl:TransitionContentControl.ContentTemplate>
-                <DataTemplate>
+                <DataTemplate x:Key="HeroSlide">
                     <Grid Background="{Binding Converter={StaticResource BackdropBrush}}">
                         <!-- Gradient navy phủ từ trái (cho chữ dễ đọc) và từ dưới lên -->
                         <Rectangle>
                             <Rectangle.Fill>
                                 <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
                                     <GradientStop Color="{StaticResource NavyDarkestColor}" Offset="0" />
-                                    <GradientStop Color="#B3070F1F" Offset="0.45" />
-                                    <GradientStop Color="#00070F1F" Offset="1" />
+                                    <GradientStop Color="#E6070F1F" Offset="0.36" />
+                                    <GradientStop Color="#26070F1F" Offset="1" />
                                 </LinearGradientBrush>
                             </Rectangle.Fill>
                         </Rectangle>
@@ -52,9 +44,6 @@
                             </Rectangle.Fill>
                         </Rectangle>
 
-                        <ctl:PosterView Width="230" Height="345" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,120,20">
-                            <ctl:PosterView.Effect><DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.7" /></ctl:PosterView.Effect>
-                        </ctl:PosterView>
                         <StackPanel VerticalAlignment="Center" Margin="64,0,0,20" MaxWidth="560" HorizontalAlignment="Left">
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                                 <Border Padding="9,3" CornerRadius="999" Background="{StaticResource AccentGold}" Margin="0,0,8,0">
@@ -78,8 +67,24 @@
                         </StackPanel>
                     </Grid>
                 </DataTemplate>
-            </ctl:TransitionContentControl.ContentTemplate>
-        </ctl:TransitionContentControl>
+    </UserControl.Resources>
+
+    <Grid>
+        <ctl:SkeletonBox Visibility="{Binding CurrentHero, Converter={StaticResource NullToVisible}}" />
+        <Grid x:Name="Stage" Background="Transparent" ClipToBounds="True"
+              PreviewMouseLeftButtonDown="OnPointerDown" PreviewMouseMove="OnPointerMove"
+              PreviewMouseLeftButtonUp="OnPointerUp" LostMouseCapture="OnLostCapture">
+            <ContentControl Content="{Binding CurrentHero}" ContentTemplate="{StaticResource HeroSlide}"
+                            Visibility="{Binding Content, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsed}}"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <ContentControl.RenderTransform><TranslateTransform x:Name="CurrentSlideOffset" /></ContentControl.RenderTransform>
+            </ContentControl>
+            <ContentControl x:Name="IncomingSlide" ContentTemplate="{StaticResource HeroSlide}" IsHitTestVisible="False"
+                            Visibility="{Binding Content, RelativeSource={RelativeSource Self}, Converter={StaticResource NullToCollapsed}}"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                <ContentControl.RenderTransform><TranslateTransform x:Name="IncomingSlideOffset" /></ContentControl.RenderTransform>
+            </ContentControl>
+        </Grid>
 
         <!-- Chấm điều hướng -->
         <ItemsControl ItemsSource="{Binding HeroDots}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,18">

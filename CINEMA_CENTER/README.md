@@ -1,19 +1,39 @@
-# CineBook – CINEMA_CENTER (Frontend WPF)
+# CineBook – CINEMA_CENTER
 
-App đặt vé xem phim đa hệ thống rạp (CGV, Lotte Cinema, BHD Star, Cinestar). Thư mục này **chỉ chứa phần frontend**
-(UI + ViewModel + dữ liệu giả). Backend/database do team khác làm – xem [docs/BACKEND_NOTES.md](docs/BACKEND_NOTES.md).
+App đặt vé xem phim đa hệ thống rạp (CGV, Lotte Cinema, BHD Star, Cinestar). Solution gồm ứng dụng WPF và API ASP.NET Core dùng SQL Server. Đăng nhập, đăng ký và tài khoản cá nhân trong WPF gọi API. Danh mục và luồng đặt vé WPF hiện dùng dữ liệu demo. Xem [ghi chú backend](docs/BACKEND_NOTES.md).
 
 ## Cách chạy
 
 Yêu cầu: Visual Studio 2022/2026 (workload *.NET desktop development*) hoặc .NET SDK 10, Windows 10/11.
 
-```bash
-dotnet run --project CINEMA_CENTER/src/CineBook.App
+```powershell
+dotnet run --project src/CineBook.App
 ```
 
-Hoặc mở `CINEMA_CENTER/CINEMA_CENTER.slnx` (chỉ app này) hay `Solution/DOAN.slnx` (cả 2 app) trong Visual Studio và nhấn F5.
+Hoặc mở `CINEMA_CENTER/CINEMA_CENTER.slnx` trong Visual Studio và chạy project `CineBook.App`.
 
-Dữ liệu demo: đăng nhập bằng email/SĐT bất kỳ, mật khẩu bất kỳ (trừ `wrong-password` để thử trạng thái lỗi).
+Để đăng ký hoặc đăng nhập, khởi tạo database và chạy API theo hướng dẫn bên dưới. Sau khi đăng nhập, mở menu tài khoản ở góc trên bên phải và chọn **Tài khoản**.
+
+### Khởi tạo database cho API
+
+Từ thư mục `CINEMA_CENTER`, chạy các lệnh sau trong PowerShell. Mặc định API dùng SQL Server tại `localhost` và database `CineBookDB`. Nếu dùng SQL Server Express LocalDB, đặt chuỗi kết nối cho phiên PowerShell hiện tại trước khi chạy:
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = 'Server=(localdb)\MSSQLLocalDB;Database=CineBookDB;Trusted_Connection=True;TrustServerCertificate=True;'
+```
+
+```powershell
+dotnet run --project src/CineBook.Api --no-launch-profile -- --init-db
+dotnet run --project src/CineBook.Api
+```
+
+`--init-db` áp dụng migration và nạp dữ liệu demo từ `MockData.cs`. Dùng một database mới hoặc đã được quản lý bằng migration của CineBook. Chạy lệnh một lần sau khi cập nhật lên phiên bản có trang tài khoản. Nếu dữ liệu cũ có email chính hoặc số điện thoại trùng, xử lý các tài khoản trùng trước khi áp dụng migration `AccountProfiles`.
+
+Sau khi khởi tạo, API tự bổ sung một đợt lịch 7 ngày theo giờ Việt Nam khi hết đợt demo hiện tại. API kiểm tra khi khởi động và định kỳ trong lúc chạy. Các suất chiếu cũ vẫn được giữ để tra cứu vé.
+
+WPF mặc định gọi `https://localhost:7085/`. Nếu môi trường phát triển chưa tin cậy chứng chỉ HTTPS của .NET, chạy `dotnet dev-certs https --trust`. Nếu API chạy ở địa chỉ khác, đặt biến môi trường `CineBook__ApiBaseUrl` khi khởi động WPF. Có thể kiểm tra kết nối tại `https://localhost:7085/api/movies`.
+
+**Tổng chi tiêu** lấy từ các đơn đã thanh toán của tài khoản trong SQL Server. Đơn mock trên WPF chưa được đồng bộ vào số này. Tab **Voucher** chỉ hiển thị bản ghi trong bảng `Vouchers` đang ở khoảng hiệu lực UTC.
 
 ## Cấu trúc
 
@@ -42,11 +62,12 @@ CINEMA_CENTER/
 
 | Màn hình | Ghi chú |
 |---|---|
-| Trang chủ | Hero carousel tự chuyển 6s, hàng phim cuộn ngang, rạp gần bạn (lọc theo hãng), skeleton/empty/error |
+| Trang chủ | Banner lấy poster làm nền, kéo chuột ngang hoặc tự chuyển sau 6 giây, rạp gần bạn theo thành phố đã chọn |
 | Chi tiết phim | Thanh chọn 7 ngày → lọc hãng/thành phố → rạp + giờ chiếu theo định dạng |
 | Rạp chiếu | Lọc hãng/thành phố/quận; chọn rạp xem phim + lịch chiếu |
 | Danh mục / Phim | Lọc thể loại, trạng thái, định dạng, sắp xếp; "Tải thêm" |
-| Đăng nhập / Đăng ký | Nền poster trôi chậm, panel kính mờ, validation `INotifyDataErrorInfo` |
+| Đăng nhập / Đăng ký | Xác thực qua API, định dạng ngày sinh tự động và chỉ bật nút gửi khi form hợp lệ |
+| Tài khoản cá nhân | Hồ sơ lưu vào SQL Server, ảnh đại diện, xác thực và đổi mật khẩu, voucher đang phát hành |
 | Đặt vé | ① Chọn suất → ② Chọn ghế (sơ đồ sinh từ dữ liệu, zoom, đếm ngược 10:00) → ③ Bắp nước → ④ Thanh toán (mock 2s) → ⑤ Vé + QR giả |
 | Vé của tôi | Danh sách vé đã thanh toán trong phiên |
 
@@ -82,8 +103,8 @@ dotnet run --project src/CineBook.App -- "--page=booking:st|m01|cgv-1|20261116|4
 - Thư mục dự án: `CINEMA_CENTER/src/CineBook.App` (project/namespace `CineBook`) – gắn vào cấu trúc chung của repo `DOAN`.
 - Giữ ghế được gọi khi bấm **"Giữ ghế & tiếp tục"** ở bước ② (không giữ ngay khi vừa chọn ghế) để giảm số lần gọi API;
   đồng hồ 10:00 chạy từ lúc đó. Nếu backend muốn giữ ghế theo từng lần bấm, chỉ cần đổi `ToggleSeat` trong `BookingViewModel`.
-- Ngày sinh khi đăng ký nhập tay dạng `dd/MM/yyyy` (chưa có DatePicker theo theme).
+- Ngày sinh khi đăng ký nhận 8 chữ số và tự định dạng thành `dd/MM/yyyy`.
 - Không bắt buộc đăng nhập để đặt vé trong bản demo; backend nên yêu cầu token ở `POST /api/bookings`.
-- Trailer, "Nhắc tôi", Google/Facebook, Quên mật khẩu, trang Tài khoản: chỉ hiện toast (chưa có backend).
+- "Nhắc tôi", Google/Facebook và Quên mật khẩu hiện chỉ hiện toast.
 - Mã QR trên vé là **placeholder** (không quét được).
-- Vị trí: mock luôn trả TP.HCM; người dùng đổi thành phố thủ công ở Header (kể cả khi bị từ chối quyền vị trí).
+- Trang chủ ưu tiên thành phố lưu trong tài khoản khi thành phố đó có trong danh mục demo. Khi chưa chọn, vị trí mặc định của bản demo là TP.HCM.

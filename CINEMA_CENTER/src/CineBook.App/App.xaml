@@ -37,6 +37,7 @@
             <DataTemplate DataType="{x:Type vm:HomeViewModel}"><views:HomeView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:AuthViewModel}"><views:AuthView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:MyTicketsViewModel}"><views:MyTicketsView /></DataTemplate>
+            <DataTemplate DataType="{x:Type vm:AccountViewModel}"><views:AccountView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:BookingViewModel}"><views:BookingView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:CategoriesViewModel}"><views:CategoriesView /></DataTemplate>
             <DataTemplate DataType="{x:Type vm:CinemasViewModel}"><views:CinemasView /></DataTemplate>

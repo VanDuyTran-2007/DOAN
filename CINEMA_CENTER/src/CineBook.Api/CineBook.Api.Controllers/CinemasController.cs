@@ -32,6 +32,13 @@ public class CinemasController : ControllerBase
 	[HttpGet("cinemas/{id}/movies")]
 	public async Task<IActionResult> GetMoviesAtCinema(string id)
 	{
-		return Ok(await _db.Movies.Where((Movie m) => m.Status == "NowShowing").ToListAsync());
+		if (!await _db.Cinemas.AnyAsync(cinema => cinema.Id == id))
+			return NotFound();
+
+		var now = DateTime.UtcNow;
+		return Ok(await _db.Movies.AsNoTracking()
+			.Where(movie => movie.Status == "NowShowing" && _db.Showtimes.Any(showtime =>
+				showtime.MovieId == movie.Id && showtime.Auditorium!.CinemaId == id && showtime.EndTimeUtc > now))
+			.OrderBy(movie => movie.Title).ToListAsync());
 	}
 }

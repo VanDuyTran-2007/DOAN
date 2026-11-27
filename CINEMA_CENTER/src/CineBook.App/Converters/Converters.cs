@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using CineBook.Models;
 
 namespace CineBook.Converters;
@@ -92,9 +93,37 @@ public class PosterBrushConverter : IValueConverter
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
         if (value is not Movie m) return Brushes.Transparent;
-        if (!string.IsNullOrWhiteSpace(m.PosterUrl) && Uri.TryCreate(m.PosterUrl, UriKind.Absolute, out var uri))
-            return new ImageBrush(new System.Windows.Media.Imaging.BitmapImage(uri)) { Stretch = Stretch.UniformToFill };
-        return Gradient(m.PlaceholderColorHex, new Point(0, 0), new Point(1, 1));
+        return TryCreatePosterBrush(m.PosterUrl, 384)
+            ?? Gradient(m.PlaceholderColorHex, new Point(0, 0), new Point(1, 1));
+    }
+
+    internal static Brush? TryCreatePosterBrush(string url, int width, bool useAsBackdrop = false)
+    {
+        const string localPosterPath = "pack://application:,,,/poster/";
+        if (url.StartsWith(localPosterPath, StringComparison.OrdinalIgnoreCase))
+            url = $"pack://application:,,,/{typeof(PosterBrushConverter).Assembly.GetName().Name};component/poster/{url[localPosterPath.Length..]}";
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return null;
+        try
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.DecodePixelWidth = width;
+            bitmap.UriSource = uri;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            var brush = new ImageBrush(bitmap) { Stretch = Stretch.UniformToFill };
+            if (useAsBackdrop)
+            {
+                brush.AlignmentY = AlignmentY.Top;
+                brush.Viewbox = new Rect(0, .10, 1, .90);
+            }
+            if (brush.CanFreeze) brush.Freeze();
+            return brush;
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or InvalidOperationException or NotSupportedException)
+        {
+            return null;
+        }
     }
 
     internal static Brush Gradient(string hex, Point start, Point end)
@@ -109,11 +138,15 @@ public class PosterBrushConverter : IValueConverter
     public object ConvertBack(object value, Type t, object p, CultureInfo c) => throw new NotSupportedException();
 }
 
-/// <summary>Movie → brush backdrop (ngang): gradient từ màu phim sang navy.</summary>
+/// <summary>Poster phủ nền banner, cắt từ phần trên để ưu tiên giữ chủ thể.</summary>
 public class BackdropBrushConverter : IValueConverter
 {
     public object Convert(object value, Type t, object p, CultureInfo c)
-        => value is Movie m ? PosterBrushConverter.Gradient(m.PlaceholderColorHex, new Point(0, 0), new Point(1, 0.8)) : Brushes.Transparent;
+    {
+        if (value is not Movie movie) return Brushes.Transparent;
+        return PosterBrushConverter.TryCreatePosterBrush(movie.PosterUrl, 960, useAsBackdrop: true)
+            ?? PosterBrushConverter.Gradient(movie.PlaceholderColorHex, new Point(0, 0), new Point(1, 0.8));
+    }
     public object ConvertBack(object value, Type t, object p, CultureInfo c) => throw new NotSupportedException();
 }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using CineBook.Api.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +90,7 @@ public class BookingsController : ControllerBase
 		{
 			Id = Guid.NewGuid().ToString("N"),
 			Code = "CB" + Random.Shared.Next(100000, 999999),
-			UserId = (string.IsNullOrWhiteSpace(req.UserId) ? null : req.UserId),
+			UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
 			ShowtimeId = req.ShowtimeId,
 			Status = "Pending",
 			TotalAmount = seatTotal + comboTotal,
@@ -131,7 +132,8 @@ public class BookingsController : ControllerBase
 			.ThenInclude((Showtime s) => s.Auditorium)
 			.ThenInclude((Auditorium a) => a.Cinema)
 			.FirstOrDefaultAsync((Booking b) => b.Id == bookingId);
-		if (booking == null || booking.Showtime == null)
+		if (booking == null || booking.Showtime == null ||
+		    booking.UserId is not null && booking.UserId != User.FindFirstValue(ClaimTypes.NameIdentifier))
 		{
 			return Ok(new
 			{
@@ -174,30 +176,18 @@ public class BookingsController : ControllerBase
 	}
 
 	[HttpGet("me/bookings")]
-	public async Task<IActionResult> GetMyTickets([FromQuery] string? userId, [FromQuery] string? ids)
+	public async Task<IActionResult> GetMyTickets([FromQuery] string? ids)
 	{
-		List<string> idList = (string.IsNullOrWhiteSpace(ids) ? new List<string>() : ids.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
+		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		var idList = ids?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Take(100).ToArray() ?? [];
 		IQueryable<Booking> query = from b in _db.Bookings.Include((Booking b) => b.Showtime).ThenInclude((Showtime s) => s.Movie).Include((Booking b) => b.Showtime)
 				.ThenInclude((Showtime s) => s.Auditorium)
 				.ThenInclude((Auditorium a) => a.Cinema)
 			where b.Status == "Paid"
 			select b;
-		if (!string.IsNullOrWhiteSpace(userId) && idList.Count > 0)
-		{
-			query = query.Where((Booking b) => b.UserId == userId || idList.Contains(b.Id));
-		}
-		else if (!string.IsNullOrWhiteSpace(userId))
-		{
-			query = query.Where((Booking b) => b.UserId == userId);
-		}
-		else
-		{
-			if (idList.Count <= 0)
-			{
-				return Ok(Array.Empty<object>());
-			}
-			query = query.Where((Booking b) => idList.Contains(b.Id));
-		}
+		query = query.Where(booking => booking.UserId == null
+			? idList.Contains(booking.Id)
+			: booking.UserId == userId);
 		List<Booking> bookings = await query.OrderByDescending((Booking b) => b.CreatedAtUtc).ToListAsync();
 		List<string> bookingIds = bookings.Select((Booking b) => b.Id).ToList();
 		Dictionary<string, List<Seat>> seatsByBooking = (from x in await (from bs in _db.BookingSeats

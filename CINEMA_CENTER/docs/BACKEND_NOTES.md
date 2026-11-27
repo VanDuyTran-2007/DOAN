@@ -1,7 +1,8 @@
 # BACKEND_NOTES – CineBook (CINEMA_CENTER)
 
 Tài liệu dành cho **backend/database team**. Frontend (WPF) chỉ giao tiếp qua các interface trong
-`src/CineBook.App/Services/Interfaces/Interfaces.cs`. Hiện tất cả đang dùng **Mock service** (dữ liệu cứng).
+`src/CineBook.App/Services/Interfaces/Interfaces.cs`. Đăng nhập và đăng ký dùng `ApiAccountService` với cookie phiên.
+Các thao tác hồ sơ gọi `/api/account`. Danh mục và luồng đặt vé WPF vẫn dùng mock.
 
 Cách tìm nhanh trong Visual Studio: `View → Task List`, thêm 3 token `TODO-BACKEND`, `NOTE-DB`, `WARNING-BACKEND`
 (*Tools → Options → Environment → Task List → Tokens*). Hoặc tìm toàn solution theo 3 chuỗi đó.

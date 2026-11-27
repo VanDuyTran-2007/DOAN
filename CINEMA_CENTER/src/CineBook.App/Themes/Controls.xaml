@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:h="clr-namespace:CineBook.Helpers">
 
     <!-- ============ BUTTON ============
          Hover/pressed dùng VisualStateManager + ColorAnimation 150ms.
@@ -180,6 +181,13 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BurgundyHover}" /></Trigger>
                         <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMuted}" /></Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="h:FormField.HasInput" Value="True" />
+                                <Condition Property="Validation.HasError" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Success}" />
+                        </MultiTrigger>
                         <Trigger Property="Validation.HasError" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
                         <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Bd" Property="Opacity" Value="0.5" /></Trigger>
                     </ControlTemplate.Triggers>
@@ -206,6 +214,14 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BurgundyHover}" /></Trigger>
                         <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource TextMuted}" /></Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="h:FormField.HasInput" Value="True" />
+                                <Condition Property="Validation.HasError" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Success}" />
+                        </MultiTrigger>
+                        <Trigger Property="Validation.HasError" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -319,11 +335,13 @@
                     <Grid>
                         <ToggleButton Style="{StaticResource ComboToggle}" Focusable="False"
                                       IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" />
-                        <ContentPresenter Content="{TemplateBinding SelectionBoxItem}"
+                        <ContentPresenter x:Name="SelectionText" Content="{TemplateBinding SelectionBoxItem}"
                                           ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                           Margin="{TemplateBinding Padding}" VerticalAlignment="Center" HorizontalAlignment="Left"
                                           IsHitTestVisible="False" />
-                        <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True" Focusable="False"
+                        <TextBox x:Name="PART_EditableTextBox" Margin="0,0,28,0" Visibility="Collapsed"
+                                 IsReadOnly="{TemplateBinding IsReadOnly}" MaxLength="100" />
+                        <Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True" Focusable="False"
                                PopupAnimation="Fade">
                             <Border MinWidth="{TemplateBinding ActualWidth}" MaxHeight="280" Margin="0,4,0,8" Background="{StaticResource NavySurface}"
                                     BorderBrush="{StaticResource NavyBorder}" BorderThickness="1" CornerRadius="6">
@@ -332,6 +350,12 @@
                             </Border>
                         </Popup>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="True">
+                            <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="SelectionText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

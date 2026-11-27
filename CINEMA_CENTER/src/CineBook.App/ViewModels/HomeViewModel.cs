@@ -99,6 +99,17 @@ public partial class HomeViewModel : ViewModelBase
 
     private void NextHero() => ShowHero(_heroIndex + 1);
 
+    internal Movie? HeroAtOffset(int offset) => HeroMovies.Count < 2
+        ? null
+        : HeroMovies[(_heroIndex + offset + HeroMovies.Count) % HeroMovies.Count];
+
+    internal void PauseHeroRotation() => _heroTimer.Stop();
+
+    internal void MoveHero(int offset)
+    {
+        SelectHero(_heroIndex + offset);
+    }
+
     [RelayCommand]
     private void SelectHero(int index)
     {
@@ -116,7 +127,7 @@ public partial class HomeViewModel : ViewModelBase
             foreach (var b in brands) BrandFilters.Add(NewFilter(b.Id, b.Name, false));
 
             // Lấy vị trí hiện tại; nếu bị từ chối (null) thì dùng thành phố chọn thủ công ở Header.
-            var loc = await _location.GetCurrentLocationAsync();
+            var loc = _state.PreferredCity ?? await _location.GetCurrentLocationAsync();
             if (loc is not null)
             {
                 _suppressCityReload = true;

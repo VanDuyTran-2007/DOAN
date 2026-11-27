@@ -15,6 +15,17 @@ public class User
 	public string PasswordHash { get; set; } = string.Empty;
 
 	public string AvatarUrl { get; set; } = string.Empty;
+	public byte[]? AvatarBytes { get; set; }
+	public string? AvatarContentType { get; set; }
+	public int AvatarChanges { get; set; }
+	public DateTime? AvatarCooldownUntilUtc { get; set; }
+	public string? SecondaryEmail1 { get; set; }
+	public string? SecondaryEmail2 { get; set; }
+	public string City { get; set; } = string.Empty;
+	public string District { get; set; } = string.Empty;
+	public int PasswordCheckFailures { get; set; }
+	public Guid SessionVersion { get; set; }
+	public byte[] Version { get; set; } = [];
 
 	public string MemberTier { get; set; } = "Standard";
 

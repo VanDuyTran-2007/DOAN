@@ -54,7 +54,7 @@ public partial class HeaderViewModel : ObservableObject
     private void OnNavigated(object? sender, EventArgs e)
     {
         // Rời các trang thuộc menu thì bỏ gạch chân.
-        if (_nav.Current is HomeViewModel or MovieDetailViewModel or AuthViewModel or BookingViewModel or MyTicketsViewModel)
+        if (_nav.Current is HomeViewModel or MovieDetailViewModel or AuthViewModel or BookingViewModel or MyTicketsViewModel or AccountViewModel)
             ActiveMenu = "";
         else if (_nav.Current is CinemasViewModel) ActiveMenu = "Cinemas";
     }
@@ -111,7 +111,8 @@ public partial class HeaderViewModel : ObservableObject
     private void GoAccount()
     {
         IsUserMenuOpen = false;
-        _toast.Show("Trang tài khoản sẽ do nhóm backend/profile bổ sung sau", ToastKind.Info);
+        if (IsSignedIn) _nav.NavigateTo<AccountViewModel>();
+        else _nav.NavigateTo<AuthViewModel>(AuthTab.SignIn);
     }
 
     [RelayCommand]

@@ -6,6 +6,7 @@
     <!-- DataContext = HomeViewModel. Trang cuộn dọc: Hero → Đang chiếu → HOT → Sắp chiếu → Rạp gần bạn -->
     <ctl:CinematicPreviewHost BookMovieCommand="{Binding BookMovieCommand}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
         <StackPanel>
             <ctl:HeroBanner />
 
@@ -57,6 +58,16 @@
                 </ctl:StatefulContent>
             </StackPanel>
         </StackPanel>
+            <Rectangle Height="104" Margin="0,388,0,0" VerticalAlignment="Top" IsHitTestVisible="False">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0" />
+                        <GradientStop Color="#B8000000" Offset="0.5" />
+                        <GradientStop Color="#00000000" Offset="1" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
     </ScrollViewer>
     </ctl:CinematicPreviewHost>
 </UserControl>

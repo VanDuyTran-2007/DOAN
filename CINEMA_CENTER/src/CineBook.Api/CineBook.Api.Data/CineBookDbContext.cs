@@ -29,6 +29,7 @@ public class CineBookDbContext : DbContext
 	public DbSet<Booking> Bookings => Set<Booking>();
 
 	public DbSet<BookingCombo> BookingCombos => Set<BookingCombo>();
+	public DbSet<Voucher> Vouchers => Set<Voucher>();
 
 	public CineBookDbContext(DbContextOptions<CineBookDbContext> options)
 		: base(options)
@@ -46,5 +47,28 @@ public class CineBookDbContext : DbContext
 		modelBuilder.Entity<BookingCombo>().HasKey((BookingCombo x) => new { x.BookingId, x.ComboId });
 		modelBuilder.Entity<BookingCombo>().HasOne<Booking>().WithMany()
 			.HasForeignKey((BookingCombo x) => x.BookingId);
+
+		var user = modelBuilder.Entity<User>();
+		user.Property(x => x.Email).HasMaxLength(254);
+		user.Property(x => x.Phone).HasMaxLength(32);
+		user.Property(x => x.SecondaryEmail1).HasMaxLength(254);
+		user.Property(x => x.SecondaryEmail2).HasMaxLength(254);
+		user.Property(x => x.City).HasMaxLength(100);
+		user.Property(x => x.District).HasMaxLength(100);
+		user.Property(x => x.Version).IsRowVersion();
+		user.HasIndex(x => x.Email).IsUnique();
+		user.HasIndex(x => x.Phone).IsUnique();
+
+		foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(entity => entity.GetProperties()))
+		{
+			// Giữ cả khóa ghép dưới giới hạn kích thước chỉ mục của SQL Server.
+			if (property.ClrType == typeof(string) && property.Name.EndsWith("Id", StringComparison.Ordinal))
+				property.SetMaxLength(128);
+			if (property.ClrType == typeof(decimal))
+			{
+				property.SetPrecision(18);
+				property.SetScale(2);
+			}
+		}
 	}
 }

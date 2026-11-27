@@ -5,23 +5,28 @@
     <!-- DataContext = AuthViewModel -->
     <StackPanel>
         <TextBlock Text="Họ và tên" Style="{StaticResource FieldLabel}" Margin="0,0,0,5" />
-        <TextBox x:Name="NameBox" Text="{Binding SignUp.FullName, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox x:Name="NameBox" Text="{Binding SignUp.FullName, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"
+                 h:FormField.HasInput="{Binding SignUp.FullName, Converter={StaticResource NotEmpty}}" />
         <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=NameBox}" />
 
         <TextBlock Text="Email" Style="{StaticResource FieldLabel}" />
-        <TextBox x:Name="EmailBox" Text="{Binding SignUp.Email, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox x:Name="EmailBox" Text="{Binding SignUp.Email, UpdateSourceTrigger=PropertyChanged}" MaxLength="254"
+                 h:FormField.HasInput="{Binding SignUp.Email, Converter={StaticResource NotEmpty}}" />
         <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=EmailBox}" />
 
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="10" /><ColumnDefinition /></Grid.ColumnDefinitions>
             <StackPanel>
                 <TextBlock Text="Số điện thoại" Style="{StaticResource FieldLabel}" />
-                <TextBox x:Name="PhoneBox" Text="{Binding SignUp.Phone, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" />
+                <TextBox x:Name="PhoneBox" Text="{Binding SignUp.Phone, UpdateSourceTrigger=PropertyChanged}" MaxLength="10"
+                         h:FormField.HasInput="{Binding SignUp.Phone, Converter={StaticResource NotEmpty}}" />
                 <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PhoneBox}" />
             </StackPanel>
             <StackPanel Grid.Column="2">
                 <TextBlock Text="Ngày sinh (dd/MM/yyyy)" Style="{StaticResource FieldLabel}" />
-                <TextBox x:Name="BirthBox" Text="{Binding SignUp.BirthDate, UpdateSourceTrigger=PropertyChanged}" MaxLength="10" />
+                <TextBox x:Name="BirthBox" Text="{Binding SignUp.BirthDate, UpdateSourceTrigger=PropertyChanged}" MaxLength="10"
+                         TextChanged="OnBirthDateChanged" InputScope="Digits"
+                         h:FormField.HasInput="{Binding SignUp.BirthDate, Converter={StaticResource NotEmpty}}" />
                 <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=BirthBox}" />
             </StackPanel>
         </Grid>
@@ -29,9 +34,11 @@
         <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}" />
         <Grid>
             <PasswordBox x:Name="PwdBox" h:PasswordHelper.Attach="True" Padding="12,9,40,9"
+                         MaxLength="256" h:FormField.HasInput="{Binding SignUp.Password, Converter={StaticResource NotEmpty}}"
                          h:PasswordHelper.Password="{Binding SignUp.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Visibility="{Binding SignUp.ShowPassword, Converter={StaticResource InvBoolToVis}}" />
             <TextBox Text="{Binding SignUp.Password, UpdateSourceTrigger=PropertyChanged}" Padding="12,9,40,9"
+                     MaxLength="256" h:FormField.HasInput="{Binding SignUp.Password, Converter={StaticResource NotEmpty}}"
                      Visibility="{Binding SignUp.ShowPassword, Converter={StaticResource BoolToVis}}" />
             <ToggleButton Style="{StaticResource EyeToggle}" HorizontalAlignment="Right" IsChecked="{Binding SignUp.ShowPassword}" />
         </Grid>
@@ -39,10 +46,13 @@
 
         <TextBlock Text="Nhập lại mật khẩu" Style="{StaticResource FieldLabel}" />
         <PasswordBox x:Name="ConfirmBox" h:PasswordHelper.Attach="True"
+                     MaxLength="256" h:FormField.HasInput="{Binding SignUp.ConfirmPassword, Converter={StaticResource NotEmpty}}"
                      h:PasswordHelper.Password="{Binding SignUp.ConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
         <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=ConfirmBox}" />
 
-        <CheckBox x:Name="TermsBox" Margin="0,14,0,0" IsChecked="{Binding SignUp.AcceptTerms}" Content="Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật" />
+        <CheckBox x:Name="TermsBox" Margin="0,14,0,0" IsChecked="{Binding SignUp.AcceptTerms}">
+            <TextBlock Text="Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật" MaxWidth="330" TextWrapping="Wrap" />
+        </CheckBox>
         <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TermsBox}" />
 
         <TextBlock Text="{Binding ServerError}" Style="{StaticResource FieldError}" Margin="0,10,0,0" />

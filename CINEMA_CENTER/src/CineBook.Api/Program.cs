@@ -1,23 +1,74 @@
 using CineBook.Api.Data;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 public class Program
 {
-	private static void Main(string[] args)
+	private static async Task Main(string[] args)
 	{
-		WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+		const string initDatabaseOption = "--init-db";
+		bool initDatabase = args.Contains(initDatabaseOption);
+		WebApplicationBuilder builder = WebApplication.CreateBuilder(
+			args.Where(arg => arg != initDatabaseOption).ToArray());
+		if (initDatabase)
+		{
+			builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+		}
 		builder.Services.AddControllers();
-		builder.Services.AddDbContext<CineBookDbContext>((DbContextOptionsBuilder options) =>
+		builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+		builder.Services.AddSingleton<AccountPasswords>();
+		builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+		{
+			options.Cookie.Name = "CineBook.Session";
+			options.Cookie.SameSite = SameSiteMode.Strict;
+			options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+			options.ExpireTimeSpan = TimeSpan.FromHours(8);
+			options.Events.OnValidatePrincipal = async context =>
+			{
+				var id = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+				var version = context.Principal?.FindFirstValue("session_version");
+				var db = context.HttpContext.RequestServices.GetRequiredService<CineBookDbContext>();
+				if (Guid.TryParseExact(version, "N", out var sessionVersion) &&
+				    await db.Users.AnyAsync(user => user.Id == id && !user.IsLocked && user.SessionVersion == sessionVersion,
+				        context.HttpContext.RequestAborted))
+					return;
+				context.RejectPrincipal();
+				await context.HttpContext.SignOutAsync();
+			};
+		});
+		builder.Services.AddAuthorization();
+		builder.Services.AddDbContext<CineBookDbContext>((provider, options) =>
 		{
 			options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+			if (initDatabase)
+			{
+				options.UseAsyncSeeding(async (context, _, ct) =>
+				{
+					var db = (CineBookDbContext)context;
+					await provider.GetRequiredService<AccountPasswords>().UpgradeStoredPlaintextAsync(db, ct);
+					await DemoDataSeeder.SeedAsync(db, ct);
+				});
+			}
 		});
+		if (!initDatabase)
+			builder.Services.AddHostedService<DemoScheduleWorker>();
 		WebApplication webApplication = builder.Build();
+		if (initDatabase)
+		{
+			await using var initializationApp = webApplication;
+			await using var scope = initializationApp.Services.CreateAsyncScope();
+			var db = scope.ServiceProvider.GetRequiredService<CineBookDbContext>();
+			await db.Database.MigrateAsync();
+			Console.WriteLine("Đã cập nhật schema và dữ liệu demo CineBook.");
+			return;
+		}
 		webApplication.UseHttpsRedirection();
+		webApplication.UseAuthentication();
 		webApplication.UseAuthorization();
 		webApplication.MapControllers();
-		webApplication.Run();
+		await webApplication.RunAsync();
 	}
 }
