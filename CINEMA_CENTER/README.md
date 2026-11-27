@@ -35,6 +35,8 @@ WPF mặc định gọi `https://localhost:7085/`. Nếu môi trường phát tr
 
 **Tổng chi tiêu** lấy từ các đơn đã thanh toán của tài khoản trong SQL Server. Đơn mock trên WPF chưa được đồng bộ vào số này. Tab **Voucher** chỉ hiển thị bản ghi trong bảng `Vouchers` đang ở khoảng hiệu lực UTC.
 
+Nếu muốn nhiều máy dùng cùng dữ liệu, xem [triển khai API chung và xem dữ liệu trong SSMS](docs/SHARED_API.md).
+
 ## Cấu trúc
 
 ```

@@ -1,6 +1,7 @@
 using CineBook.Api.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -64,6 +65,14 @@ public class Program
 			await db.Database.MigrateAsync();
 			Console.WriteLine("Đã cập nhật schema và dữ liệu demo CineBook.");
 			return;
+		}
+		if (builder.Configuration.GetValue<bool>("CineBook:UseLoopbackProxy"))
+		{
+			// Nhận scheme HTTPS từ proxy chạy trên cùng máy.
+			webApplication.UseForwardedHeaders(new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.XForwardedProto
+			});
 		}
 		webApplication.UseHttpsRedirection();
 		webApplication.UseAuthentication();
