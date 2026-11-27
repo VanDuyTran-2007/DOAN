@@ -146,9 +146,16 @@
                 <StackPanel Orientation="Horizontal" Visibility="{Binding IsSignedIn, Converter={StaticResource BoolToVis}}">
                     <Button x:Name="AvatarButton" Style="{StaticResource GhostButton}" Command="{Binding ToggleUserMenuCommand}" Padding="4">
                         <StackPanel Orientation="Horizontal">
-                            <Border Width="34" Height="34" CornerRadius="17" Background="{StaticResource BrandGradient}">
-                                <TextBlock Text="{Binding CurrentUser.Initials}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
-                            </Border>
+                            <Grid Width="34" Height="34">
+                                <Ellipse Fill="{StaticResource BrandGradient}" />
+                                <TextBlock Text="{Binding CurrentUser.Initials}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"
+                                           Visibility="{Binding State.AccountAvatar, Converter={StaticResource NullToVisible}}" />
+                                <Ellipse Visibility="{Binding State.AccountAvatar, Converter={StaticResource NullToCollapsed}}">
+                                    <Ellipse.Fill>
+                                        <ImageBrush ImageSource="{Binding State.AccountAvatar}" Stretch="UniformToFill" />
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                            </Grid>
                             <TextBlock Text="{Binding CurrentUser.FullName}" VerticalAlignment="Center" Margin="8,0,2,0" Foreground="{StaticResource TextPrimary}" />
                             <Path Data="{StaticResource IconChevronDown}" Fill="{StaticResource TextSecondary}" Width="14" Height="14" Stretch="Uniform" />
                         </StackPanel>

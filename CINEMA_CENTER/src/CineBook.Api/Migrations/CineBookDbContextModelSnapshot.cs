@@ -229,6 +229,30 @@ namespace CineBook.Api.Migrations
                     b.ToTable("Combos");
                 });
 
+            modelBuilder.Entity("CineBook.Api.Data.ExternalLogin", b =>
+                {
+                    b.Property<string>("Provider")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Provider", "Subject");
+
+                    b.HasIndex("UserId", "Provider")
+                        .IsUnique();
+
+                    b.ToTable("ExternalLogins");
+                });
+
             modelBuilder.Entity("CineBook.Api.Data.Movie", b =>
                 {
                     b.Property<string>("Id")
@@ -502,7 +526,8 @@ namespace CineBook.Api.Migrations
                         .IsUnique();
 
                     b.HasIndex("Phone")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[Phone] <> N''");
 
                     b.ToTable("Users");
                 });
@@ -585,6 +610,17 @@ namespace CineBook.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Brand");
+                });
+
+            modelBuilder.Entity("CineBook.Api.Data.ExternalLogin", b =>
+                {
+                    b.HasOne("CineBook.Api.Data.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CineBook.Api.Data.SeatHoldSeat", b =>

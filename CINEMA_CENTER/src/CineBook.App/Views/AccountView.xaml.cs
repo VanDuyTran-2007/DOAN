@@ -19,6 +19,16 @@ public partial class AccountView : UserControl
     private void OnVerifyPassword(object sender, RoutedEventArgs e) => OpenPasswordWindow(change: false);
     private void OnChangePassword(object sender, RoutedEventArgs e) => OpenPasswordWindow(change: true);
 
+    private async void OnSetInitialPassword(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is AccountViewModel account &&
+            await account.SetInitialPasswordAsync(InitialPassword.Password, InitialConfirmation.Password))
+        {
+            InitialPassword.Clear();
+            InitialConfirmation.Clear();
+        }
+    }
+
     private void OpenPasswordWindow(bool change)
     {
         if (DataContext is not AccountViewModel vm) return;

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 using CineBook.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -8,6 +9,7 @@ namespace CineBook.Services;
 public partial class AppState : ObservableObject
 {
     [ObservableProperty] private GeoLocation? _selectedCity;
+    [ObservableProperty] private ImageSource? _accountAvatar;
     public GeoLocation? PreferredCity { get; set; }
 }
 

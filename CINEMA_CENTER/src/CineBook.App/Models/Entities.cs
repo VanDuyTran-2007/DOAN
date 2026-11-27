@@ -128,6 +128,7 @@ public class User
     public string Phone { get; init; } = "";
     public string AvatarUrl { get; init; } = "";
     public MemberTier MemberTier { get; init; }
+    public bool RequiresPasswordSetup { get; init; }
     public string Initials => string.Concat(FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries).TakeLast(2).Select(w => char.ToUpper(w[0])));
 }
 
@@ -164,7 +165,7 @@ public record PagedResult<T>(IReadOnlyList<T> Items, int TotalCount, int Page, i
     public bool HasMore => Page * PageSize < TotalCount;
 }
 public record GeoLocation(double Latitude, double Longitude, string City);
-public record AuthResult(bool Success, string? Error, User? User);
+public record AuthResult(bool Success, string? Error, User? User, bool InvalidCredentials = false);
 public record SignUpRequest(string FullName, string Email, string Phone, DateTime BirthDate, string Password);
 public record CreateBookingRequest(string ShowtimeId, string HoldId, IReadOnlyList<string> SeatIds, IReadOnlyDictionary<string, int> Combos);
 public record PaymentResult(bool Success, string? Error, Booking? Booking);

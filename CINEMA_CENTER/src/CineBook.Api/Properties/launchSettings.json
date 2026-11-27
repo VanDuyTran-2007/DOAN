@@ -8,6 +8,16 @@
             "environmentVariables": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
             }
+        },
+        "tailscale": {
+            "commandName": "Project",
+            "dotnetRunMessages": true,
+            "launchBrowser": false,
+            "applicationUrl": "http://127.0.0.1:5085",
+            "environmentVariables": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "CineBook__UseLoopbackProxy": "true"
+            }
         }
     }
 }

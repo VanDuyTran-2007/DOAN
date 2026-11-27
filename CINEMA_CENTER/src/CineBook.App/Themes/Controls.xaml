@@ -189,6 +189,7 @@
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Success}" />
                         </MultiTrigger>
                         <Trigger Property="Validation.HasError" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
+                        <Trigger Property="h:FormField.CredentialsRejected" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
                         <Trigger Property="IsEnabled" Value="False"><Setter TargetName="Bd" Property="Opacity" Value="0.5" /></Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -222,6 +223,7 @@
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Success}" />
                         </MultiTrigger>
                         <Trigger Property="Validation.HasError" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
+                        <Trigger Property="h:FormField.CredentialsRejected" Value="True"><Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Error}" /></Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

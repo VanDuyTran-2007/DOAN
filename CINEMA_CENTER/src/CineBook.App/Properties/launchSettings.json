@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "Local": {
+      "commandName": "Project"
+    },
+    "Tailscale": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "CineBook__ApiBaseUrl": "https://hoangsang.tail50798d.ts.net/"
+      }
+    }
+  }
+}

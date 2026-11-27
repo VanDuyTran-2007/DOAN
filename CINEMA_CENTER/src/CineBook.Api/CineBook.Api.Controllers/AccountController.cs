@@ -18,6 +18,7 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
     private const int PasswordCheckLimit = 3;
 
     [HttpGet]
+    [AllowDuringPasswordSetup]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var user = await FindAccountAsync(ct);
@@ -42,7 +43,7 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
         user.Email = primary;
         user.SecondaryEmail1 = secondary1;
         user.SecondaryEmail2 = secondary2;
-        user.Phone = request.Phone.Trim();
+        user.Phone = request.Phone?.Trim() ?? "";
         user.City = request.City?.Trim() ?? "";
         user.District = request.District?.Trim() ?? "";
         try { await db.SaveChangesAsync(ct); }
@@ -142,6 +143,26 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
         return NoContent();
     }
 
+    [HttpPut("password/setup")]
+    [AllowDuringPasswordSetup]
+    public async Task<IActionResult> SetInitialPassword(SetAccountPasswordDto request, CancellationToken ct)
+    {
+        var user = await FindAccountAsync(ct);
+        if (user is null) return Unauthorized();
+        if (!User.HasClaim("password_setup", "true") || user.PasswordHash.Length != 0)
+            return Problem(statusCode: 409, detail: "Tài khoản đã có mật khẩu. Hãy dùng chức năng đổi mật khẩu.");
+        if (request.NewPassword != request.Confirmation)
+            return Problem(statusCode: 400, detail: "Mật khẩu mới và xác nhận chưa khớp.");
+
+        user.PasswordHash = passwords.Hash(user, request.NewPassword);
+        user.SessionVersion = Guid.NewGuid();
+        try { await db.SaveChangesAsync(ct); }
+        catch (DbUpdateConcurrencyException) { return RetryConflict(); }
+
+        await AuthController.StartSessionAsync(HttpContext, user);
+        return Ok(AuthController.ToUser(user));
+    }
+
     [HttpGet("vouchers")]
     public async Task<IActionResult> GetVouchers(CancellationToken ct)
     {
@@ -162,6 +183,8 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
     {
         var totalSpent = await db.Bookings.Where(booking => booking.UserId == user.Id && booking.Status == "Paid")
             .SumAsync(booking => booking.TotalAmount, ct);
+        var linkedProviders = await db.ExternalLogins.Where(link => link.UserId == user.Id)
+            .Select(link => link.Provider).ToListAsync(ct);
         var cooldown = user.AvatarCooldownUntilUtc > DateTime.UtcNow
             ? new DateTimeOffset(DateTime.SpecifyKind(user.AvatarCooldownUntilUtc.Value, DateTimeKind.Utc))
             : (DateTimeOffset?)null;
@@ -171,7 +194,8 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
             user.City, user.District, user.BirthDate, user.MemberTier, TotalSpent = totalSpent,
             HasAvatar = user.AvatarBytes is not null, AvatarCooldownUntil = cooldown,
             AvatarChangesRemaining = cooldown is not null ? 0 : user.AvatarCooldownUntilUtc is null ? AvatarLimit - user.AvatarChanges : AvatarLimit,
-            PasswordCheckLocked = user.PasswordCheckFailures >= PasswordCheckLimit
+            PasswordCheckLocked = user.PasswordCheckFailures >= PasswordCheckLimit,
+            RequiresPasswordSetup = user.PasswordHash.Length == 0, LinkedProviders = linkedProviders
         };
     }
 
@@ -196,13 +220,17 @@ public sealed class AccountController(CineBookDbContext db, AccountPasswords pas
 public record UpdateAccountDto(
     [Required, StringLength(100, MinimumLength = 2)] string FullName,
     [Required, StringLength(254), EmailAddress] string Email,
-    [Required, RegularExpression("^0[0-9]{9}$")] string Phone,
+    [RegularExpression("^0[0-9]{9}$")] string? Phone,
     [StringLength(254), EmailAddress] string? SecondaryEmail1,
     [StringLength(254), EmailAddress] string? SecondaryEmail2,
     [StringLength(100)] string? City,
     [StringLength(100)] string? District);
 
 public record VerifyAccountPasswordDto([Required, StringLength(256)] string Password);
+
+public record SetAccountPasswordDto(
+    [Required, StringLength(256, MinimumLength = 8)] string NewPassword,
+    [Required, StringLength(256)] string Confirmation);
 
 public record ChangeAccountPasswordDto(
     [Required, StringLength(256)] string CurrentPassword,

@@ -52,6 +52,7 @@ public partial class App : Application
         services.AddSingleton<ApiAccountService>();
         services.AddSingleton<IAuthService>(provider => provider.GetRequiredService<ApiAccountService>());
         services.AddSingleton<IAccountService>(provider => provider.GetRequiredService<ApiAccountService>());
+        services.AddSingleton<ISocialAuthService>(provider => provider.GetRequiredService<ApiAccountService>());
         // TODO-BACKEND: MockBookingService → ApiBookingService
         services.AddSingleton<IBookingService, MockBookingService>();
         // TODO-BACKEND: MockLocationService → WindowsLocationService (hoặc giữ mock nếu chỉ cần chọn thành phố)

@@ -12,16 +12,18 @@ namespace CineBook.ViewModels;
 public partial class AuthViewModel : ViewModelBase
 {
     private readonly IAuthService _auth;
+    private readonly ISocialAuthService _social;
     private readonly INavigationService _nav;
     private readonly IToastService _toast;
     private readonly IMovieService _movies;
 
-    public AuthViewModel(IAuthService auth, INavigationService nav, IToastService toast, IMovieService movies)
+    public AuthViewModel(IAuthService auth, ISocialAuthService social, INavigationService nav, IToastService toast, IMovieService movies)
     {
-        _auth = auth; _nav = nav; _toast = toast; _movies = movies;
+        _auth = auth; _social = social; _nav = nav; _toast = toast; _movies = movies;
         SignIn.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SignIn.CanSubmit)) SignInCommand.NotifyCanExecuteChanged();
+            if (e.PropertyName == nameof(SignIn.CredentialsRejected) && !SignIn.CredentialsRejected) ServerError = null;
         };
         SignUp.PropertyChanged += (_, e) =>
         {
@@ -46,6 +48,8 @@ public partial class AuthViewModel : ViewModelBase
 
     partial void OnSelectedTabChanged(int value) => ServerError = null;
 
+    public override void OnNavigatedFrom() => SocialCommand.Cancel();
+
     private bool CanSignIn() => SignIn.CanSubmit;
     private bool CanSignUp() => SignUp.CanSubmit;
 
@@ -53,14 +57,19 @@ public partial class AuthViewModel : ViewModelBase
     private async Task SignInAsync()
     {
         ServerError = null;
-        if (!SignIn.Validate()) return;
+        if (IsBusy || !SignIn.Validate()) return;
         IsBusy = true;
         try
         {
             var r = await _auth.SignInAsync(SignIn.Identity.Trim(), SignIn.Password);
-            if (!r.Success) { ServerError = r.Error; return; }
+            if (!r.Success)
+            {
+                if (r.InvalidCredentials) SignIn.RejectCredentials();
+                ServerError = r.Error;
+                return;
+            }
             _toast.Show($"Xin chào, {r.User?.FullName}!", ToastKind.Success);
-            LeaveAfterSuccess();
+            LeaveAfterSuccess(r.User);
         }
         catch (Exception ex) { ServerError = "Không kết nối được máy chủ: " + ex.Message; }
         finally { IsBusy = false; }
@@ -70,7 +79,7 @@ public partial class AuthViewModel : ViewModelBase
     private async Task SignUpAsync()
     {
         ServerError = null;
-        if (!SignUp.Validate()) return;
+        if (IsBusy || !SignUp.Validate()) return;
         IsBusy = true;
         try
         {
@@ -78,25 +87,39 @@ public partial class AuthViewModel : ViewModelBase
             var r = await _auth.SignUpAsync(new SignUpRequest(SignUp.FullName.Trim(), SignUp.Email.Trim(), SignUp.Phone.Trim(), birth, SignUp.Password));
             if (!r.Success) { ServerError = r.Error; return; }
             _toast.Show("Đăng ký thành công, chào mừng bạn đến CineBook!", ToastKind.Success);
-            LeaveAfterSuccess();
+            LeaveAfterSuccess(r.User);
         }
         catch (Exception ex) { ServerError = "Không kết nối được máy chủ: " + ex.Message; }
         finally { IsBusy = false; }
     }
 
-    private void LeaveAfterSuccess()
+    private void LeaveAfterSuccess(User? user)
     {
-        if (_nav.CanGoBack) _nav.GoBack(); else _nav.NavigateTo<HomeViewModel>();
+        if (user?.RequiresPasswordSetup == true) _nav.NavigateTo<AccountViewModel>();
+        else if (_nav.CanGoBack) _nav.GoBack();
+        else _nav.NavigateTo<HomeViewModel>();
     }
 
     [RelayCommand] private void BackHome() => _nav.NavigateTo<HomeViewModel>();
     [RelayCommand] private void GoSignUp() => SelectedTab = 1;
     [RelayCommand] private void GoSignIn() => SelectedTab = 0;
 
-    [RelayCommand]
-    private void Social(string provider)
-        // Chỉ là UI. TODO-BACKEND: POST /api/auth/oauth/{provider} (OAuth2 code flow) → AuthResult.
-        => _toast.Show($"Đăng nhập bằng {provider} chưa được hỗ trợ trong bản demo", ToastKind.Info);
+    [RelayCommand(IncludeCancelCommand = true)]
+    private async Task SocialAsync(string provider, CancellationToken ct)
+    {
+        if (IsBusy) return;
+        ServerError = null;
+        IsBusy = true;
+        try
+        {
+            var result = await _social.AuthenticateAsync(provider, link: false, ct);
+            if (!result.Success) { ServerError = result.Error; return; }
+            LeaveAfterSuccess(result.User);
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { }
+        catch (Exception) { ServerError = $"Không thể đăng nhập bằng {provider}. Vui lòng thử lại."; }
+        finally { IsBusy = false; }
+    }
 
     [RelayCommand]
     private void ForgotPassword()

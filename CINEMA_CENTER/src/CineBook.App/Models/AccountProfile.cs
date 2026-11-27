@@ -3,7 +3,8 @@ namespace CineBook.Models;
 public record AccountProfile(
     string Id, string FullName, string Email, string Phone, string? SecondaryEmail1, string? SecondaryEmail2,
     string City, string District, DateOnly? BirthDate, string MemberTier, decimal TotalSpent, bool HasAvatar,
-    DateTimeOffset? AvatarCooldownUntil, int AvatarChangesRemaining, bool PasswordCheckLocked)
+    DateTimeOffset? AvatarCooldownUntil, int AvatarChangesRemaining, bool PasswordCheckLocked,
+    bool RequiresPasswordSetup = false, IReadOnlyList<string>? LinkedProviders = null)
 {
     public string Rank => MemberTier.ToLowerInvariant() switch
     {

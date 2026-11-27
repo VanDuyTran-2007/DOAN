@@ -37,6 +37,8 @@ WPF mặc định gọi `https://localhost:7085/`. Nếu môi trường phát tr
 
 Nếu muốn nhiều máy dùng cùng dữ liệu, xem [triển khai API chung và xem dữ liệu trong SSMS](docs/SHARED_API.md).
 
+Đăng nhập Google và Facebook cần cấu hình ứng dụng OAuth trên máy chạy API. Xem [cách khai báo callback và lưu cấu hình OAuth](docs/SOCIAL_LOGIN.md).
+
 ## Cấu trúc
 
 ```

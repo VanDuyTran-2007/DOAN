@@ -6,6 +6,22 @@
 
 Chọn một máy chạy cả API và SQL Server. Nếu nhóm demo trực tiếp và đã có HTTPS nội bộ, dùng địa chỉ nội bộ của máy đó. Nếu các thành viên ở xa nhau, nhờ người quản trị mạng của nhóm hoặc giảng viên cấp một mạng riêng. Một lựa chọn để tham khảo là [Tailscale Serve](https://tailscale.com/docs/use-cases/application-testing/share-local-dev-server-with-team), dùng proxy HTTPS trên chính máy chạy API.
 
+### Start trong Visual Studio
+
+Mở `CINEMA_CENTER.slnx` và chọn profile bên cạnh nút Start. Nếu solution đang mở từ trước, đóng rồi mở lại để Visual Studio đọc các profile mới.
+
+| Profile | Dùng ở đâu | Khi bấm Start |
+|---|---|---|
+| **CineBook - Local** | Máy đang test riêng | Chạy API và WPF với cấu hình localhost |
+| **CineBook - Tailscale Host** | Máy có SQL Server và đang chia sẻ API | Chạy API nội bộ cổng 5085 và WPF trỏ tới URL Tailscale |
+| **CineBook - Tailscale Client** | Máy của thành viên đã kết nối Tailscale | Chạy WPF với URL Tailscale |
+
+Trên **máy chủ**, giữ Tailscale kết nối và chạy `tailscale serve http://127.0.0.1:5085` trong PowerShell Administrator. Sau đó chọn **CineBook - Tailscale Host** và bấm Start. Nếu đã cấu hình Serve chạy nền, kiểm tra bằng `tailscale serve status`. Máy thành viên chọn **CineBook - Tailscale Client** và bấm Start.
+
+URL chung lưu trong `src/CineBook.App/Properties/launchSettings.json`, ở profile `Tailscale`. Khi đổi máy chủ hoặc đổi URL, cập nhật trường `CineBook__ApiBaseUrl` ở đó.
+
+### Chạy bằng PowerShell
+
 1. Trên máy chủ demo, nếu database chưa được khởi tạo, chạy lệnh `--init-db` theo README. Mở PowerShell tại thư mục dự án và giữ tiến trình API chạy.
 
    ```powershell

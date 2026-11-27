@@ -20,6 +20,17 @@ public partial class SignInFormViewModel : ObservableValidator
 
     [ObservableProperty] private bool _rememberMe;
     [ObservableProperty] private bool _showPassword;
+    [ObservableProperty] private bool _credentialsRejected;
+
+    partial void OnIdentityChanged(string value) => CredentialsRejected = false;
+    partial void OnPasswordChanged(string value) => CredentialsRejected = false;
+
+    public void RejectCredentials()
+    {
+        Password = "";
+        ShowPassword = false;
+        CredentialsRejected = true;
+    }
 
     public bool CanSubmit => !HasErrors && !string.IsNullOrWhiteSpace(Identity) && !string.IsNullOrEmpty(Password);
 

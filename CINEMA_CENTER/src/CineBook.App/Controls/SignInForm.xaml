@@ -5,16 +5,26 @@
     <!-- DataContext = AuthViewModel -->
     <StackPanel>
         <TextBlock Text="Email hoặc số điện thoại" Style="{StaticResource FieldLabel}" Margin="0,0,0,5" />
-        <TextBox x:Name="IdentityBox" Text="{Binding SignIn.Identity, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox x:Name="IdentityBox" Text="{Binding SignIn.Identity, UpdateSourceTrigger=PropertyChanged}"
+                 MaxLength="254" IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}"
+                 h:FormField.HasInput="{Binding SignIn.Identity, Converter={StaticResource NotEmpty}}"
+                 h:FormField.CredentialsRejected="{Binding SignIn.CredentialsRejected}">
+            <TextBox.RenderTransform><TranslateTransform x:Name="IdentityOffset" /></TextBox.RenderTransform>
+        </TextBox>
         <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=IdentityBox}" />
 
         <TextBlock Text="Mật khẩu" Style="{StaticResource FieldLabel}" />
-        <Grid>
+        <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
+            <Grid.RenderTransform><TranslateTransform x:Name="PasswordOffset" /></Grid.RenderTransform>
             <!-- PasswordBox (ẩn ký tự) và TextBox (hiện ký tự) dùng chung 1 giá trị; nút con mắt chuyển qua lại -->
             <PasswordBox x:Name="PwdBox" h:PasswordHelper.Attach="True" Padding="12,9,40,9"
+                         MaxLength="256" h:FormField.HasInput="{Binding SignIn.Password, Converter={StaticResource NotEmpty}}"
+                         h:FormField.CredentialsRejected="{Binding SignIn.CredentialsRejected}"
                          h:PasswordHelper.Password="{Binding SignIn.Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Visibility="{Binding SignIn.ShowPassword, Converter={StaticResource InvBoolToVis}}" />
             <TextBox Text="{Binding SignIn.Password, UpdateSourceTrigger=PropertyChanged}" Padding="12,9,40,9"
+                     MaxLength="256" h:FormField.HasInput="{Binding SignIn.Password, Converter={StaticResource NotEmpty}}"
+                     h:FormField.CredentialsRejected="{Binding SignIn.CredentialsRejected}"
                      Visibility="{Binding SignIn.ShowPassword, Converter={StaticResource BoolToVis}}" />
             <ToggleButton Style="{StaticResource EyeToggle}" HorizontalAlignment="Right" IsChecked="{Binding SignIn.ShowPassword}" />
         </Grid>
@@ -37,9 +47,15 @@
             <TextBlock Text="hoặc" Style="{StaticResource TextCaption}" HorizontalAlignment="Center" Padding="10,0" Background="Transparent" />
         </Grid>
         <UniformGrid Columns="2">
-            <Button Content="Google" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Command="{Binding SocialCommand}" CommandParameter="Google" />
-            <Button Content="Facebook" Style="{StaticResource SecondaryButton}" Margin="5,0,0,0" Command="{Binding SocialCommand}" CommandParameter="Facebook" />
+            <Button Content="Google" Style="{StaticResource SecondaryButton}" Margin="0,0,5,0" Command="{Binding SocialCommand}" CommandParameter="Google"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}" />
+            <Button Content="Facebook" Style="{StaticResource SecondaryButton}" Margin="5,0,0,0" Command="{Binding SocialCommand}" CommandParameter="Facebook"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}" />
         </UniformGrid>
+        <StackPanel Margin="0,8,0,0" Visibility="{Binding SocialCommand.IsRunning, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Hoàn tất đăng nhập trong trình duyệt." Style="{StaticResource TextCaption}" />
+            <Button Content="Hủy" Command="{Binding SocialCancelCommand}" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" />
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
             <TextBlock Text="Chưa có tài khoản?" Style="{StaticResource TextCaption}" VerticalAlignment="Center" />

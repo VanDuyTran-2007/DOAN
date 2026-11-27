@@ -65,6 +65,7 @@ public sealed class AuthController(CineBookDbContext db, AccountPasswords passwo
     }
 
     [Authorize]
+    [AllowDuringPasswordSetup]
     [HttpPost("sign-out")]
     public async Task<IActionResult> SignOutAccount()
     {
@@ -76,13 +77,18 @@ public sealed class AuthController(CineBookDbContext db, AccountPasswords passwo
         error.InnerException is SqlException { Number: 2601 or 2627 };
 
     internal static object ToUser(User user) =>
-        new { user.Id, user.FullName, user.Email, user.Phone, user.AvatarUrl, user.MemberTier };
+        new { user.Id, user.FullName, user.Email, user.Phone, user.AvatarUrl, user.MemberTier,
+            RequiresPasswordSetup = user.PasswordHash.Length == 0 };
 
     internal static Task StartSessionAsync(HttpContext context, User user)
     {
-        var identity = new ClaimsIdentity(
-            [new(ClaimTypes.NameIdentifier, user.Id), new("session_version", user.SessionVersion.ToString("N"))],
-            CookieAuthenticationDefaults.AuthenticationScheme);
+        var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+        identity.AddClaim(new(ClaimTypes.NameIdentifier, user.Id));
+        identity.AddClaim(new("session_version", user.SessionVersion.ToString("N")));
+        if (user.PasswordHash.Length == 0) identity.AddClaim(new("password_setup", "true"));
         return context.SignInAsync(new ClaimsPrincipal(identity));
     }
 }
+
+[AttributeUsage(AttributeTargets.Method)]
+internal sealed class AllowDuringPasswordSetupAttribute : Attribute;

@@ -1,3 +1,4 @@
+using CineBook.Api.Controllers;
 using CineBook.Api.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,7 +22,8 @@ public class Program
 		builder.Services.AddControllers();
 		builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 		builder.Services.AddSingleton<AccountPasswords>();
-		builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+		builder.Services.AddSingleton<ExternalAuthFlows>();
+		var authentication = builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
 		{
 			options.Cookie.Name = "CineBook.Session";
 			options.Cookie.SameSite = SameSiteMode.Strict;
@@ -40,6 +42,7 @@ public class Program
 				await context.HttpContext.SignOutAsync();
 			};
 		});
+		authentication.AddCineBookProviders(builder.Configuration);
 		builder.Services.AddAuthorization();
 		builder.Services.AddDbContext<CineBookDbContext>((provider, options) =>
 		{
@@ -76,6 +79,17 @@ public class Program
 		}
 		webApplication.UseHttpsRedirection();
 		webApplication.UseAuthentication();
+		webApplication.Use(async (context, next) =>
+		{
+			if (context.User.HasClaim("password_setup", "true") &&
+			    context.GetEndpoint()?.Metadata.GetMetadata<AllowDuringPasswordSetupAttribute>() is null)
+			{
+				context.Response.StatusCode = StatusCodes.Status403Forbidden;
+				await context.Response.WriteAsJsonAsync(new { detail = "Hãy đặt mật khẩu trước khi tiếp tục." });
+				return;
+			}
+			await next(context);
+		});
 		webApplication.UseAuthorization();
 		webApplication.MapControllers();
 		await webApplication.RunAsync();

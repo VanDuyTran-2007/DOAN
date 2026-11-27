@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CineBook.Models;
+using CineBook.Navigation;
 using CineBook.Services;
 using CineBook.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -9,13 +10,13 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace CineBook.ViewModels;
 
-public sealed partial class AccountViewModel(IAccountService accounts, ILocationService locations, IToastService toast)
+public sealed partial class AccountViewModel(IAccountService accounts, IAuthService auth, ISocialAuthService social,
+    ILocationService locations, IToastService toast, INavigationService navigation, AppState state)
     : ViewModelBase
 {
     private CancellationTokenSource? _page;
 
     [ObservableProperty] private AccountProfile? _profile;
-    [ObservableProperty] private ImageSource? _avatar;
     [ObservableProperty] private string _fullName = "";
     [ObservableProperty] private string _email = "";
     [ObservableProperty] private string _phone = "";
@@ -24,26 +25,38 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
     [ObservableProperty] private string _city = "";
     [ObservableProperty] private string _district = "";
     [ObservableProperty] private string? _error;
+    [ObservableProperty] private bool _mustSetPassword;
+    [ObservableProperty] private int _selectedTab;
 
     public IReadOnlyList<string> Cities { get; } = locations.Cities.Select(location => location.City).ToArray();
     public SectionState<AccountVoucher> Vouchers { get; } = new(accounts.GetVouchersAsync);
-    public bool HasAvatar => Avatar is not null;
+    public AppState State { get; } = state;
     public bool HasProfile => Profile is not null;
     public bool CanChangeAvatar => Profile is { } profile &&
         (profile.AvatarCooldownUntil is null || profile.AvatarCooldownUntil <= DateTimeOffset.UtcNow);
     public bool CanVerify => Profile is { PasswordCheckLocked: false };
 
-    partial void OnAvatarChanged(ImageSource? value) => OnPropertyChanged(nameof(HasAvatar));
     partial void OnProfileChanged(AccountProfile? value)
     {
         OnPropertyChanged(nameof(HasProfile));
         OnPropertyChanged(nameof(CanChangeAvatar));
         OnPropertyChanged(nameof(CanVerify));
+        OnPropertyChanged(nameof(GoogleLinkLabel));
+        OnPropertyChanged(nameof(FacebookLinkLabel));
+        LinkProviderCommand.NotifyCanExecuteChanged();
     }
+
+    public string GoogleLinkLabel => ProviderLinked("Google") ? "Google đã liên kết" : "Liên kết Google";
+    public string FacebookLinkLabel => ProviderLinked("Facebook") ? "Facebook đã liên kết" : "Liên kết Facebook";
+
+    private bool ProviderLinked(string provider) => Profile?.LinkedProviders?.Contains(provider) == true;
+    private bool CanLinkProvider(string provider) => Profile is not null && !MustSetPassword && !ProviderLinked(provider);
 
     public override async Task OnNavigatedToAsync(object? parameter)
     {
         _page = new CancellationTokenSource();
+        MustSetPassword = auth.CurrentUser?.RequiresPasswordSetup == true;
+        if (MustSetPassword) SelectedTab = 1;
         await ReloadAsync();
     }
 
@@ -60,7 +73,7 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
     {
         var profile = await accounts.GetProfileAsync(ct);
         FillEditor(profile);
-        Avatar = profile.HasAvatar ? Decode(await accounts.GetAvatarAsync(ct)) : null;
+        if (MustSetPassword) return;
         await Vouchers.LoadAsync();
     });
 
@@ -77,7 +90,6 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
     {
         var png = await Task.Run(() => PrepareAvatar(filePath), ct);
         Profile = await accounts.UploadAvatarAsync(png, ct);
-        Avatar = Decode(png);
         toast.Show("Đã đổi ảnh đại diện.", ToastKind.Success);
     });
 
@@ -98,6 +110,44 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
         toast.Show("Đã đổi mật khẩu.", ToastKind.Success);
     }
 
+    public async Task<bool> SetInitialPasswordAsync(string password, string confirmation)
+    {
+        if (!MustSetPassword || IsBusy) return false;
+        if (password.Length < 8 || password != confirmation)
+        {
+            Error = "Mật khẩu cần ít nhất 8 ký tự và phải khớp ô xác nhận.";
+            return false;
+        }
+
+        var saved = false;
+        await RunAsync(async ct =>
+        {
+            await accounts.SetInitialPasswordAsync(password, confirmation, ct);
+            MustSetPassword = false;
+            if (Profile is { } profile) Profile = profile with { RequiresPasswordSetup = false };
+            saved = true;
+            toast.Show("Đã đặt mật khẩu cho tài khoản CineBook.", ToastKind.Success);
+            await Vouchers.LoadAsync();
+        });
+        return saved;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanLinkProvider))]
+    private Task LinkProviderAsync(string provider) => RunAsync(async ct =>
+    {
+        var result = await social.AuthenticateAsync(provider, link: true, ct);
+        if (!result.Success) { Error = result.Error; return; }
+        Profile = await accounts.GetProfileAsync(ct);
+        toast.Show($"Đã liên kết {provider}.", ToastKind.Success);
+    });
+
+    [RelayCommand]
+    private async Task SignOutAsync()
+    {
+        await auth.SignOutAsync();
+        navigation.NavigateTo<HomeViewModel>();
+    }
+
     private async Task RunAsync(Func<CancellationToken, Task> action)
     {
         if (IsBusy || _page is null) return;
@@ -112,6 +162,8 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
 
     private void FillEditor(AccountProfile profile)
     {
+        MustSetPassword = profile.RequiresPasswordSetup;
+        if (MustSetPassword) SelectedTab = 1;
         Profile = profile;
         FullName = profile.FullName;
         Email = profile.Email;
@@ -143,18 +195,5 @@ public sealed partial class AccountViewModel(IAccountService accounts, ILocation
         {
             throw new InvalidDataException("Ảnh không hợp lệ. Hãy chọn tệp PNG hoặc JPEG.", ex);
         }
-    }
-
-    private static BitmapImage Decode(byte[] bytes)
-    {
-        using var stream = new MemoryStream(bytes);
-        var image = new BitmapImage();
-        image.BeginInit();
-        image.CacheOption = BitmapCacheOption.OnLoad;
-        image.DecodePixelWidth = 300;
-        image.StreamSource = stream;
-        image.EndInit();
-        image.Freeze();
-        return image;
     }
 }

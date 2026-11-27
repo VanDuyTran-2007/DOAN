@@ -1,6 +1,7 @@
 using CineBook.Models;
 using CineBook.Navigation;
 using CineBook.Services;
+using CineBook.Services.Interfaces;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace CineBook.ViewModels;
@@ -9,10 +10,12 @@ namespace CineBook.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly INavigationService _nav;
+    private readonly IAuthService _auth;
 
-    public MainViewModel(INavigationService nav, HeaderViewModel header, IToastService toast)
+    public MainViewModel(INavigationService nav, HeaderViewModel header, IToastService toast, IAuthService auth)
     {
         _nav = nav;
+        _auth = auth;
         Header = header;
         Toast = toast;
         _nav.Navigated += (_, _) =>
@@ -20,6 +23,7 @@ public partial class MainViewModel : ObservableObject
             OnPropertyChanged(nameof(Current));
             OnPropertyChanged(nameof(IsHeaderVisible));
         };
+        _auth.AuthStateChanged += (_, _) => OnPropertyChanged(nameof(IsHeaderVisible));
     }
 
     public HeaderViewModel Header { get; }
@@ -27,7 +31,7 @@ public partial class MainViewModel : ObservableObject
     public ViewModelBase? Current => _nav.Current;
 
     /// <summary>Trang đăng nhập/đăng ký ẩn header theo thiết kế.</summary>
-    public bool IsHeaderVisible => Current is not AuthViewModel;
+    public bool IsHeaderVisible => Current is not AuthViewModel && _auth.CurrentUser?.RequiresPasswordSetup != true;
 
     /// <summary>Mở trang đầu tiên. <paramref name="page"/> chỉ dùng cho dev/QA (xem DevOptions).</summary>
     public void Start(string? page = null)

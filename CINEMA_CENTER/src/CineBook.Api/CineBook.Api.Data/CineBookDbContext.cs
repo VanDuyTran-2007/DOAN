@@ -30,6 +30,7 @@ public class CineBookDbContext : DbContext
 
 	public DbSet<BookingCombo> BookingCombos => Set<BookingCombo>();
 	public DbSet<Voucher> Vouchers => Set<Voucher>();
+	public DbSet<ExternalLogin> ExternalLogins => Set<ExternalLogin>();
 
 	public CineBookDbContext(DbContextOptions<CineBookDbContext> options)
 		: base(options)
@@ -57,7 +58,14 @@ public class CineBookDbContext : DbContext
 		user.Property(x => x.District).HasMaxLength(100);
 		user.Property(x => x.Version).IsRowVersion();
 		user.HasIndex(x => x.Email).IsUnique();
-		user.HasIndex(x => x.Phone).IsUnique();
+		user.HasIndex(x => x.Phone).IsUnique().HasFilter("[Phone] <> N''");
+
+		var external = modelBuilder.Entity<ExternalLogin>();
+		external.HasKey(x => new { x.Provider, x.Subject });
+		external.Property(x => x.Provider).HasMaxLength(16);
+		external.Property(x => x.Subject).HasMaxLength(255).UseCollation("Latin1_General_100_BIN2");
+		external.HasIndex(x => new { x.UserId, x.Provider }).IsUnique();
+		external.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId);
 
 		foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(entity => entity.GetProperties()))
 		{

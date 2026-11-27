@@ -1,0 +1,42 @@
+[
+  {
+    "Name": "CineBook - Local",
+    "Projects": [
+      {
+        "Path": "src\\CineBook.Api\\CineBook.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "src\\CineBook.App\\CineBook.App.csproj",
+        "Action": "Start",
+        "DebugTarget": "Local"
+      }
+    ]
+  },
+  {
+    "Name": "CineBook - Tailscale Host",
+    "Projects": [
+      {
+        "Path": "src\\CineBook.Api\\CineBook.Api.csproj",
+        "Action": "Start",
+        "DebugTarget": "tailscale"
+      },
+      {
+        "Path": "src\\CineBook.App\\CineBook.App.csproj",
+        "Action": "Start",
+        "DebugTarget": "Tailscale"
+      }
+    ]
+  },
+  {
+    "Name": "CineBook - Tailscale Client",
+    "Projects": [
+      {
+        "Path": "src\\CineBook.App\\CineBook.App.csproj",
+        "Action": "Start",
+        "DebugTarget": "Tailscale"
+      }
+    ]
+  }
+]

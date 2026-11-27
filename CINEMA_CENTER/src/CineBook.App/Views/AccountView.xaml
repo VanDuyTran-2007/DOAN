@@ -26,8 +26,8 @@
             <TextBlock Text="{Binding Error}" Style="{StaticResource FieldError}" Margin="0,8,0,0" />
 
             <TabControl Margin="0,16,0,0" Visibility="{Binding HasProfile, Converter={StaticResource BoolToVis}}"
-                        IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
-                <TabItem Header="Thông tin chung">
+                        SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
+                <TabItem Header="Thông tin chung" Visibility="{Binding MustSetPassword, Converter={StaticResource InvBoolToVis}}">
                     <StackPanel Margin="0,18,0,0">
                         <Border Style="{StaticResource AccountPanel}">
                             <Grid>
@@ -39,10 +39,10 @@
                                     <Ellipse Fill="{StaticResource Burgundy}" />
                                     <TextBlock Text="{Binding Profile.FullName, Converter={StaticResource FirstLetter}}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="36" FontWeight="Bold"
-                                               Visibility="{Binding HasAvatar, Converter={StaticResource InvBoolToVis}}" />
-                                    <Ellipse Visibility="{Binding HasAvatar, Converter={StaticResource BoolToVis}}">
+                                               Visibility="{Binding State.AccountAvatar, Converter={StaticResource NullToVisible}}" />
+                                    <Ellipse Visibility="{Binding State.AccountAvatar, Converter={StaticResource NullToCollapsed}}">
                                         <Ellipse.Fill>
-                                            <ImageBrush ImageSource="{Binding Avatar}" Stretch="UniformToFill" />
+                                            <ImageBrush ImageSource="{Binding State.AccountAvatar}" Stretch="UniformToFill" />
                                         </Ellipse.Fill>
                                     </Ellipse>
                                 </Grid>
@@ -94,6 +94,21 @@
                 <TabItem Header="Chi tiết tài khoản">
                     <Border Style="{StaticResource AccountPanel}" Margin="0,18,0,0">
                         <StackPanel>
+                            <StackPanel MaxWidth="420" HorizontalAlignment="Left"
+                                        Visibility="{Binding MustSetPassword, Converter={StaticResource BoolToVis}}">
+                                <TextBlock Text="Đặt mật khẩu cho CineBook" Style="{StaticResource TextH3}" />
+                                <TextBlock Text="Bạn cần đặt mật khẩu cho tài khoản mới để tiếp tục." TextWrapping="Wrap"
+                                           Style="{StaticResource TextBody}" Margin="0,6,0,4" />
+                                <Label Content="Mật khẩu mới" Target="{Binding ElementName=InitialPassword}" Margin="0,10,0,0" />
+                                <PasswordBox x:Name="InitialPassword" MaxLength="256" />
+                                <Label Content="Xác nhận mật khẩu" Target="{Binding ElementName=InitialConfirmation}" Margin="0,10,0,0" />
+                                <PasswordBox x:Name="InitialConfirmation" MaxLength="256" />
+                                <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                                    <Button Content="Lưu mật khẩu" Style="{StaticResource PrimaryButton}" Click="OnSetInitialPassword" />
+                                    <Button Content="Đăng xuất" Style="{StaticResource SecondaryButton}" Command="{Binding SignOutCommand}" Margin="8,0,0,0" />
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Visibility="{Binding MustSetPassword, Converter={StaticResource InvBoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
@@ -141,11 +156,22 @@
                             <TextBlock Text="Đã khóa tính năng xem mật khẩu. Hãy đổi mật khẩu để mở lại."
                                        Style="{StaticResource FieldError}" Margin="0,8,0,0"
                                        Visibility="{Binding CanVerify, Converter={StaticResource InvBoolToVis}}" />
+                            <Border Background="{StaticResource NavyBorder}" Height="1" Margin="0,22,0,16" />
+                            <TextBlock Text="Liên kết đăng nhập" Style="{StaticResource TextH3}" />
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Content="{Binding GoogleLinkLabel}" Command="{Binding LinkProviderCommand}" CommandParameter="Google"
+                                        Style="{StaticResource SecondaryButton}" Margin="0,0,8,0" />
+                                <Button Content="{Binding FacebookLinkLabel}" Command="{Binding LinkProviderCommand}" CommandParameter="Facebook"
+                                        Style="{StaticResource SecondaryButton}" />
+                            </StackPanel>
+                            <TextBlock Text="Hoàn tất xác thực trong trình duyệt." Style="{StaticResource TextCaption}" Margin="0,8,0,0"
+                                       Visibility="{Binding LinkProviderCommand.IsRunning, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
                         </StackPanel>
                     </Border>
                 </TabItem>
 
-                <TabItem Header="Voucher">
+                <TabItem Header="Voucher" Visibility="{Binding MustSetPassword, Converter={StaticResource InvBoolToVis}}">
                     <StackPanel Margin="0,18,0,0">
                         <TextBlock Text="Đang tải voucher…" Style="{StaticResource TextBody}"
                                    Visibility="{Binding Vouchers.IsLoading, Converter={StaticResource BoolToVis}}" />
