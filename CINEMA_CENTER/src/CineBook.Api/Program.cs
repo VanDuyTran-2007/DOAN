@@ -13,8 +13,11 @@ public class Program
 	{
 		const string initDatabaseOption = "--init-db";
 		bool initDatabase = args.Contains(initDatabaseOption);
-		WebApplicationBuilder builder = WebApplication.CreateBuilder(
-			args.Where(arg => arg != initDatabaseOption).ToArray());
+		WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions
+		{
+			Args = args.Where(arg => arg != initDatabaseOption).ToArray(),
+			ContentRootPath = AppContext.BaseDirectory
+		});
 		if (initDatabase)
 		{
 			builder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);

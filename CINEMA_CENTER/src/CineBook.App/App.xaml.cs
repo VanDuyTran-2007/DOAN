@@ -20,6 +20,7 @@ public partial class App : Application
         base.OnStartup(e);
 
         _host = Host.CreateDefaultBuilder()
+            .UseContentRoot(AppContext.BaseDirectory)
             .ConfigureServices(ConfigureServices)
             .Build();
         await _host.StartAsync();
@@ -46,7 +47,9 @@ public partial class App : Application
         services.AddSingleton<ISeatService, MockSeatService>();
         services.AddSingleton<HttpClient>(_ => new SessionHttpClient(new HttpClientHandler())
         {
-            BaseAddress = new Uri(context.Configuration["CineBook:ApiBaseUrl"] ?? "https://localhost:7085/"),
+            BaseAddress = new Uri(context.Configuration["CineBook:ApiBaseUrl"]
+                ?? context.Configuration["CineBook:SharedApiBaseUrl"]
+                ?? "https://localhost:7085/"),
             Timeout = TimeSpan.FromSeconds(15)
         });
         services.AddSingleton<ApiAccountService>();

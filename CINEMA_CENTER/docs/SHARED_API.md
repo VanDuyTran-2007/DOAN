@@ -18,14 +18,14 @@ Mở `CINEMA_CENTER.slnx` và chọn profile bên cạnh nút Start. Nếu solut
 
 Trên **máy chủ**, giữ Tailscale kết nối và chạy `tailscale serve http://127.0.0.1:5085` trong PowerShell Administrator. Sau đó chọn **CineBook - Tailscale Host** và bấm Start. Nếu đã cấu hình Serve chạy nền, kiểm tra bằng `tailscale serve status`. Máy thành viên chọn **CineBook - Tailscale Client** và bấm Start.
 
-URL chung lưu trong `src/CineBook.App/Properties/launchSettings.json`, ở profile `Tailscale`. Khi đổi máy chủ hoặc đổi URL, cập nhật trường `CineBook__ApiBaseUrl` ở đó.
+URL mặc định của nhóm lưu trong `src/CineBook.App/Properties/launchSettings.json`, ở trường `CineBook__SharedApiBaseUrl` của profile `Tailscale`. Khi chuyển host chính thức, cập nhật trường này để cả nhóm nhận URL mới sau khi pull. Để thử API khác trên một máy, đặt biến môi trường `CineBook__ApiBaseUrl` trước khi khởi động WPF. Biến này được ưu tiên hơn URL mặc định của nhóm.
 
 ### Chạy bằng PowerShell
 
 1. Trên máy chủ demo, nếu database chưa được khởi tạo, chạy lệnh `--init-db` theo README. Mở PowerShell tại thư mục dự án và giữ tiến trình API chạy.
 
    ```powershell
-   dotnet run --project src/CineBook.Api --no-launch-profile -- --urls http://127.0.0.1:5085 --CineBook:UseLoopbackProxy=true
+   dotnet run --project src/CineBook.Api --launch-profile tailscale
    ```
 
 2. Nếu người quản trị đã cấu hình Tailscale trên máy chủ và các máy thử, trên máy chủ chạy lệnh sau từ PowerShell có quyền Administrator.
@@ -35,7 +35,7 @@ URL chung lưu trong `src/CineBook.App/Properties/launchSettings.json`, ở prof
    ```
 
    Dùng URL HTTPS mà Serve in ra. Người quản trị cấp quyền tới HTTPS của máy chủ cho đúng thành viên nhóm. SQL Server và cổng HTTP `5085` tiếp tục ở máy chủ. Giữ cửa sổ Serve mở khi demo và bấm **Ctrl+C** khi kết thúc. Xem [lệnh Serve](https://tailscale.com/docs/reference/tailscale-cli/serve) và [quyền truy cập khi chia sẻ máy](https://tailscale.com/docs/features/sharing).
-3. Trên một máy đồng nghiệp đã được cấp quyền, mở `https://<địa-chỉ-api>/api/movies` để kiểm tra kết nối, sau đó cấu hình WPF theo bước 4 bên dưới. Máy chủ cần bật và API cần chạy trong lúc demo.
+3. Trên máy đồng nghiệp đã được cấp quyền, mở `https://<địa-chỉ-api>/api/movies` để kiểm tra kết nối, rồi chạy `dotnet run --project src/CineBook.App --launch-profile Tailscale`. Máy chủ cần bật và API cần chạy trong lúc demo.
 
 ## Triển khai cho nhóm
 

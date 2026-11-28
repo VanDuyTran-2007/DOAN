@@ -1,0 +1,16 @@
+# Build and IDE files
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+
+# Local credentials and database files
+.env
+.env.*
+!.env.example
+secrets.json
+client_secret*.json
+*.mdf
+*.ldf
+*.bak

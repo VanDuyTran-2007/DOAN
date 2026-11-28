@@ -4,34 +4,33 @@ App đặt vé xem phim đa hệ thống rạp (CGV, Lotte Cinema, BHD Star, Cin
 
 ## Cách chạy
 
-Yêu cầu: Visual Studio 2022/2026 (workload *.NET desktop development*) hoặc .NET SDK 10, Windows 10/11.
+Trên Windows, cài **.NET SDK 10**. Nếu dùng Visual Studio, cần bản hỗ trợ .NET 10 với workload **.NET desktop development**.
 
-```powershell
-dotnet run --project src/CineBook.App
-```
+Sau khi clone hoặc pull, mở `CINEMA_CENTER.slnx` trong thư mục dự án. Thư mục clone có thể nằm ở ổ đĩa bất kỳ và đường dẫn có thể chứa dấu cách. Từ thư mục chứa solution, có thể kiểm tra restore và build bằng lệnh `dotnet build .\CINEMA_CENTER.slnx`.
 
-Hoặc mở `CINEMA_CENTER/CINEMA_CENTER.slnx` trong Visual Studio và chạy project `CineBook.App`.
-
-Để đăng ký hoặc đăng nhập, khởi tạo database và chạy API theo hướng dẫn bên dưới. Sau khi đăng nhập, mở menu tài khoản ở góc trên bên phải và chọn **Tài khoản**.
+| Profile | Cần chuẩn bị |
+|---|---|
+| **CineBook - Tailscale Client** | Kết nối vào mạng của nhóm và bấm Start khi API host đang chạy. Máy client chỉ cần chạy WPF. |
+| **CineBook - Tailscale Host** | Trên máy chia sẻ API, khởi tạo database nếu cần rồi bật Tailscale Serve. Xem [hướng dẫn dùng API chung](docs/SHARED_API.md). |
+| **CineBook - Local** | Khởi tạo database trên máy mình nếu cần và chạy `dotnet dev-certs https --trust` nếu chứng chỉ .NET chưa được tin cậy. Profile này mở cả API và WPF. |
 
 ### Khởi tạo database cho API
 
-Từ thư mục `CINEMA_CENTER`, chạy các lệnh sau trong PowerShell. Mặc định API dùng SQL Server tại `localhost` và database `CineBookDB`. Nếu dùng SQL Server Express LocalDB, đặt chuỗi kết nối cho phiên PowerShell hiện tại trước khi chạy:
+Thực hiện trên máy chạy API, từ thư mục chứa solution. Mặc định API dùng SQL Server tại `localhost` và database `CineBookDB`. Nếu SQL Server trên máy dùng instance khác, lưu chuỗi kết nối riêng của máy bằng .NET User Secrets. Ví dụ với SQL Server Express LocalDB:
 
 ```powershell
-$env:ConnectionStrings__DefaultConnection = 'Server=(localdb)\MSSQLLocalDB;Database=CineBookDB;Trusted_Connection=True;TrustServerCertificate=True;'
+dotnet user-secrets set --project src/CineBook.Api 'ConnectionStrings:DefaultConnection' 'Server=(localdb)\MSSQLLocalDB;Database=CineBookDB;Trusted_Connection=True;TrustServerCertificate=True;'
 ```
 
 ```powershell
-dotnet run --project src/CineBook.Api --no-launch-profile -- --init-db
-dotnet run --project src/CineBook.Api
+dotnet run --project src/CineBook.Api --launch-profile https -- --init-db
 ```
 
-`--init-db` áp dụng migration và nạp dữ liệu demo từ `MockData.cs`. Dùng một database mới hoặc đã được quản lý bằng migration của CineBook. Chạy lệnh một lần sau khi cập nhật lên phiên bản có trang tài khoản. Nếu dữ liệu cũ có email chính hoặc số điện thoại trùng, xử lý các tài khoản trùng trước khi áp dụng migration `AccountProfiles`.
+`--init-db` áp dụng migration và nạp dữ liệu demo từ `MockData.cs`. Chạy khi tạo database lần đầu hoặc khi cập nhật có migration mới. Dùng một database mới hoặc đã được quản lý bằng migration của CineBook. Nếu dữ liệu cũ có email chính hoặc số điện thoại trùng, xử lý các tài khoản trùng trước khi áp dụng migration `AccountProfiles`. Cả hai profile chạy API trong Visual Studio đọc cùng cấu hình database trên máy đó.
 
 Sau khi khởi tạo, API tự bổ sung một đợt lịch 7 ngày theo giờ Việt Nam khi hết đợt demo hiện tại. API kiểm tra khi khởi động và định kỳ trong lúc chạy. Các suất chiếu cũ vẫn được giữ để tra cứu vé.
 
-WPF mặc định gọi `https://localhost:7085/`. Nếu môi trường phát triển chưa tin cậy chứng chỉ HTTPS của .NET, chạy `dotnet dev-certs https --trust`. Nếu API chạy ở địa chỉ khác, đặt biến môi trường `CineBook__ApiBaseUrl` khi khởi động WPF. Có thể kiểm tra kết nối tại `https://localhost:7085/api/movies`.
+Nếu chạy Local bằng PowerShell, mở hai cửa sổ tại thư mục chứa solution. Chạy `dotnet run --project src/CineBook.Api --launch-profile https` ở cửa sổ đầu và `dotnet run --project src/CineBook.App --launch-profile Local` ở cửa sổ còn lại. Có thể kiểm tra API tại `https://localhost:7085/api/movies`.
 
 **Tổng chi tiêu** lấy từ các đơn đã thanh toán của tài khoản trong SQL Server. Đơn mock trên WPF chưa được đồng bộ vào số này. Tab **Voucher** chỉ hiển thị bản ghi trong bảng `Vouchers` đang ở khoảng hiệu lực UTC.
 
@@ -101,14 +100,12 @@ dotnet run --project src/CineBook.App -- "--page=booking:st|m01|cgv-1|20261116|4
 
 ## Giả định (quyết định nhỏ đã tự chọn)
 
-- **.NET 10** (`net10.0-windows`) thay vì .NET 8: máy dev hiện chỉ cài .NET 10 runtime, và app Villa trong cùng solution cũng dùng .NET 10.
-  Đổi về .NET 8 chỉ cần sửa `TargetFramework`.
 - Tên phim trong mock là **tên hư cấu**; poster là gradient + tên phim (không dùng poster có bản quyền). Logo hãng chỉ là chữ + màu badge.
 - Thư mục dự án: `CINEMA_CENTER/src/CineBook.App` (project/namespace `CineBook`) – gắn vào cấu trúc chung của repo `DOAN`.
 - Giữ ghế được gọi khi bấm **"Giữ ghế & tiếp tục"** ở bước ② (không giữ ngay khi vừa chọn ghế) để giảm số lần gọi API;
   đồng hồ 10:00 chạy từ lúc đó. Nếu backend muốn giữ ghế theo từng lần bấm, chỉ cần đổi `ToggleSeat` trong `BookingViewModel`.
 - Ngày sinh khi đăng ký nhận 8 chữ số và tự định dạng thành `dd/MM/yyyy`.
 - Không bắt buộc đăng nhập để đặt vé trong bản demo; backend nên yêu cầu token ở `POST /api/bookings`.
-- "Nhắc tôi", Google/Facebook và Quên mật khẩu hiện chỉ hiện toast.
+- "Nhắc tôi" và Quên mật khẩu hiện chỉ hiện toast.
 - Mã QR trên vé là **placeholder** (không quét được).
 - Trang chủ ưu tiên thành phố lưu trong tài khoản khi thành phố đó có trong danh mục demo. Khi chưa chọn, vị trí mặc định của bản demo là TP.HCM.
