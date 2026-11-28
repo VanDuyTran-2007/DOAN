@@ -1,72 +1,91 @@
 using System.Collections.Specialized;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
+using CineBook.Converters;
 using CineBook.Models;
 
 namespace CineBook.Controls;
 
-/// <summary>
-/// Nền collage poster: nhiều cột poster xếp lưới, nghiêng -8°, mỗi cột trôi chậm vô hạn (cột chẵn lên, cột lẻ xuống).
-/// Dựng bằng code vì số cột/hàng phụ thuộc dữ liệu; code-behind này chỉ làm hiển thị + animation.
-/// </summary>
-public class PosterWall : Grid
+/// <summary>Vẽ collage poster trong một lớp nền và tái sử dụng ảnh cho các ô lặp.</summary>
+public class PosterWall : FrameworkElement
 {
-    private const double PosterWidth = 150, PosterHeight = 225, CellMargin = 8;
-    private const int Columns = 12;
+    private const double PosterWidth = 150, PosterHeight = 225, Gutter = 16;
+    private const double CellWidth = PosterWidth + Gutter, CellHeight = PosterHeight + Gutter;
+    private const double Tilt = -8;
+    private static readonly double Angle = Math.Abs(Tilt) * Math.PI / 180;
+    private Brush[] _posters = [];
+    private INotifyCollectionChanged? _observedMovies;
 
     public static readonly DependencyProperty MoviesProperty = DependencyProperty.Register(
-        nameof(Movies), typeof(IEnumerable<Movie>), typeof(PosterWall), new PropertyMetadata(null, OnMoviesChanged));
+        nameof(Movies), typeof(IEnumerable<Movie>), typeof(PosterWall),
+        new PropertyMetadata(null, (wall, _) =>
+        {
+            var posterWall = (PosterWall)wall;
+            if (posterWall.IsLoaded) posterWall.RefreshMovies();
+        }));
 
-    public IEnumerable<Movie>? Movies { get => (IEnumerable<Movie>?)GetValue(MoviesProperty); set => SetValue(MoviesProperty, value); }
-
-    public PosterWall() => ClipToBounds = true;
-
-    private static void OnMoviesChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    public IEnumerable<Movie>? Movies
     {
-        var wall = (PosterWall)d;
-        if (e.OldValue is INotifyCollectionChanged oldC) oldC.CollectionChanged -= wall.OnCollectionChanged;
-        if (e.NewValue is INotifyCollectionChanged newC) newC.CollectionChanged += wall.OnCollectionChanged;
-        wall.Rebuild();
+        get => (IEnumerable<Movie>?)GetValue(MoviesProperty);
+        set => SetValue(MoviesProperty, value);
     }
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => Rebuild();
-
-    private void Rebuild()
+    public PosterWall()
     {
-        Children.Clear();
-        var movies = Movies?.ToList() ?? [];
-        if (movies.Count == 0) return;
-
-        double cellHeight = PosterHeight + CellMargin * 2;
-        double loopHeight = movies.Count * cellHeight;
-        // Mỗi cột lặp đủ để phủ màn hình + 1 vòng (để animation nối liền không giật).
-        int loops = (int)Math.Ceiling(2600 / loopHeight) + 1;
-
-        var columnsPanel = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Top };
-        for (int c = 0; c < Columns; c++)
+        ClipToBounds = true;
+        IsHitTestVisible = false;
+        Loaded += (_, _) => RefreshMovies();
+        Unloaded += (_, _) =>
         {
-            var col = new StackPanel { Width = PosterWidth + CellMargin * 2 };
-            var shift = c * 3 % movies.Count; // lệch từng cột để nhìn không bị lặp hàng ngang
-            for (int l = 0; l < loops; l++)
-                for (int i = 0; i < movies.Count; i++)
-                    col.Children.Add(new PosterView { DataContext = movies[(i + shift) % movies.Count], Width = PosterWidth, Height = PosterHeight, Margin = new Thickness(CellMargin) });
+            ObserveMovies(null);
+            _posters = [];
+            InvalidateVisual();
+        };
+    }
 
-            var move = new TranslateTransform();
-            col.RenderTransform = move;
-            bool up = c % 2 == 0;
-            if (!up) col.Margin = new Thickness(0, -loopHeight, 0, 0); // cột đi xuống: dời lên trước rồi trượt xuống
-            var anim = new DoubleAnimation(0, up ? -loopHeight : loopHeight, TimeSpan.FromSeconds(70 + c % 4 * 12))
-            { RepeatBehavior = RepeatBehavior.Forever };
-            move.BeginAnimation(TranslateTransform.YProperty, anim);
-            columnsPanel.Children.Add(col);
+    private void ObserveMovies(INotifyCollectionChanged? movies)
+    {
+        if (ReferenceEquals(_observedMovies, movies)) return;
+        if (_observedMovies is not null)
+            CollectionChangedEventManager.RemoveHandler(_observedMovies, OnCollectionChanged);
+        _observedMovies = movies;
+        if (_observedMovies is not null)
+            CollectionChangedEventManager.AddHandler(_observedMovies, OnCollectionChanged);
+    }
+
+    private void RefreshMovies()
+    {
+        ObserveMovies(Movies as INotifyCollectionChanged);
+        _posters = Movies?.Select(movie =>
+            PosterBrushConverter.TryCreatePosterBrush(movie.PosterUrl, 224)
+                ?? PosterBrushConverter.Gradient(movie.PlaceholderColorHex, new Point(0, 0), new Point(1, 1))).ToArray() ?? [];
+        InvalidateVisual();
+    }
+
+    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) => RefreshMovies();
+
+    protected override void OnRender(DrawingContext drawingContext)
+    {
+        base.OnRender(drawingContext);
+        if (_posters.Length == 0 || ActualWidth <= 0 || ActualHeight <= 0) return;
+
+        double width = ActualWidth * Math.Cos(Angle) + ActualHeight * Math.Sin(Angle);
+        double height = ActualHeight * Math.Cos(Angle) + ActualWidth * Math.Sin(Angle);
+        int columns = (int)Math.Ceiling(width / CellWidth);
+        int rows = (int)Math.Ceiling(height / CellHeight);
+        double left = (ActualWidth - columns * CellWidth) / 2;
+        double top = (ActualHeight - rows * CellHeight) / 2;
+
+        drawingContext.PushTransform(new RotateTransform(Tilt, ActualWidth / 2, ActualHeight / 2));
+        for (int column = 0; column < columns; column++)
+        {
+            for (int row = 0; row < rows; row++)
+            {
+                var rect = new Rect(left + column * CellWidth + Gutter / 2, top + row * CellHeight + Gutter / 2,
+                    PosterWidth, PosterHeight);
+                drawingContext.DrawRoundedRectangle(_posters[(row + column * 3) % _posters.Length], null, rect, 8, 8);
+            }
         }
-
-        // Nghiêng -8° và đẩy lên để lấp kín các góc sau khi xoay.
-        columnsPanel.Margin = new Thickness(0, -300, 0, 0);
-        columnsPanel.RenderTransformOrigin = new Point(0.5, 0.5);
-        columnsPanel.RenderTransform = new RotateTransform(-8);
-        Children.Add(columnsPanel);
+        drawingContext.Pop();
     }
 }

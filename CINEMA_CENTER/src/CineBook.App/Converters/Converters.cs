@@ -90,6 +90,8 @@ public class CountToVisibilityConverter : IValueConverter
 /// </summary>
 public class PosterBrushConverter : IValueConverter
 {
+    private static readonly Dictionary<(Uri Uri, int Width, bool Backdrop), WeakReference<ImageBrush>> PackagedBrushes = new();
+
     public object Convert(object value, Type t, object p, CultureInfo c)
     {
         if (value is not Movie m) return Brushes.Transparent;
@@ -100,9 +102,13 @@ public class PosterBrushConverter : IValueConverter
     internal static Brush? TryCreatePosterBrush(string url, int width, bool useAsBackdrop = false)
     {
         const string localPosterPath = "pack://application:,,,/poster/";
-        if (url.StartsWith(localPosterPath, StringComparison.OrdinalIgnoreCase))
+        bool packaged = url.StartsWith(localPosterPath, StringComparison.OrdinalIgnoreCase);
+        if (packaged)
             url = $"pack://application:,,,/{typeof(PosterBrushConverter).Assembly.GetName().Name};component/poster/{url[localPosterPath.Length..]}";
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri)) return null;
+        var key = (uri, width, useAsBackdrop);
+        if (packaged && PackagedBrushes.TryGetValue(key, out var cached) && cached.TryGetTarget(out var existing))
+            return existing;
         try
         {
             var bitmap = new BitmapImage();
@@ -117,7 +123,15 @@ public class PosterBrushConverter : IValueConverter
                 brush.AlignmentY = AlignmentY.Top;
                 brush.Viewbox = new Rect(0, .10, 1, .90);
             }
-            if (brush.CanFreeze) brush.Freeze();
+            if (brush.CanFreeze)
+            {
+                brush.Freeze();
+                if (packaged)
+                {
+                    if (PackagedBrushes.Count >= 64) PackagedBrushes.Clear();
+                    PackagedBrushes[key] = new WeakReference<ImageBrush>(brush);
+                }
+            }
             return brush;
         }
         catch (Exception ex) when (ex is System.IO.IOException or InvalidOperationException or NotSupportedException)

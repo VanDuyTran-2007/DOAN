@@ -31,7 +31,7 @@
     <SolidColorBrush x:Key="Error" Color="{StaticResource ErrorColor}" />
 
     <!-- Màu trong suốt dùng cho overlay / kính mờ -->
-    <SolidColorBrush x:Key="GlassFill" Color="#0B1A33" Opacity="0.55" />
+    <SolidColorBrush x:Key="GlassFill" Color="#E60B1A33" />
     <SolidColorBrush x:Key="GlassBorder" Color="#FFFFFF" Opacity="0.15" />
     <SolidColorBrush x:Key="ScrimBrush" Color="#000000" Opacity="0.55" />
 

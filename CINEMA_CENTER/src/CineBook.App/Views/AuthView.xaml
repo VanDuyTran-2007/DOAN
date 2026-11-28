@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ctl="clr-namespace:CineBook.Controls">
     <!-- DataContext = AuthViewModel. Full cửa sổ (header bị ẩn). -->
-    <Grid x:Name="Root" Background="{StaticResource NavyDarkest}" SizeChanged="OnLayoutChanged">
+    <Grid x:Name="Root" Background="{StaticResource NavyDarkest}">
 
-        <!-- LỚP NỀN: collage poster trôi chậm + gradient navy phủ (đây là "Visual" nguồn cho hiệu ứng kính mờ) -->
-        <Grid x:Name="BackgroundLayer">
+        <!-- Collage poster dưới lớp phủ navy. -->
+        <Grid IsHitTestVisible="False">
             <ctl:PosterWall Movies="{Binding WallMovies}" />
             <Rectangle>
                 <Rectangle.Fill>
@@ -41,18 +41,8 @@
                            Style="{StaticResource TextH3}" Foreground="{StaticResource TextSecondary}" FontWeight="Normal" TextWrapping="Wrap" Margin="0,10,0,0" />
             </StackPanel>
 
-            <!-- ============ PANEL KÍNH MỜ (glassmorphism) ============
-                 WPF không có backdrop-blur. Cách làm:
-                 1) BlurLayer: một Border lớn hơn panel 40px mỗi phía, tô bằng VisualBrush của BackgroundLayer (nền đang chạy),
-                    rồi áp BlurEffect. Code-behind chỉnh Viewbox của brush để đúng vùng nền nằm dưới panel.
-                 2) GlassPanel bị cắt (Clip) bo góc 16px để phần blur tràn ra ngoài không hiện.
-                 3) Phủ lên trên: nền #0B1A33 opacity 0.55 + viền trắng 1px opacity 0.15. -->
-            <Grid x:Name="GlassPanel" Grid.Column="2" VerticalAlignment="Center"
-                  SizeChanged="OnLayoutChanged">
-                <Border x:Name="BlurLayer" Margin="-40">
-                    <Border.Effect><BlurEffect Radius="30" KernelType="Gaussian" /></Border.Effect>
-                </Border>
-                <Border Background="{StaticResource GlassFill}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" CornerRadius="16" />
+            <Border x:Name="GlassPanel" Grid.Column="2" VerticalAlignment="Center" Background="{StaticResource GlassFill}"
+                    BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" CornerRadius="16">
 
                 <ScrollViewer Margin="28,24,20,24" Padding="0,0,8,0" VerticalScrollBarVisibility="Auto">
                     <TabControl x:Name="Tabs" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" SelectionChanged="OnTabChanged">
@@ -60,7 +50,7 @@
                         <TabItem Header="Đăng ký"><ctl:SignUpForm /></TabItem>
                     </TabControl>
                 </ScrollViewer>
-            </Grid>
+            </Border>
         </Grid>
 
         <!-- Nút quay lại -->

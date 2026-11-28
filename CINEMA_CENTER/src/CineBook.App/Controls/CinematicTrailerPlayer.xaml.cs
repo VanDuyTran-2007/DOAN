@@ -52,7 +52,14 @@ public partial class CinematicTrailerPlayer : UserControl
         if (uri is null) return;
         try
         {
-            Backdrop.Source = new BitmapImage(uri);
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = uri;
+            bitmap.DecodePixelWidth = _preview ? 480 : 1280;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            if (bitmap.CanFreeze) bitmap.Freeze();
+            Backdrop.Source = bitmap;
         }
         catch (Exception ex) when (ex is ArgumentException or InvalidOperationException or IOException or NotSupportedException)
         {
