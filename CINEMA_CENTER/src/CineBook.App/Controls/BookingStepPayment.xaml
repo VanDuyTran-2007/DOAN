@@ -54,6 +54,8 @@
             <TextBlock Text="{Binding PaymentError}" Style="{StaticResource FieldError}" Margin="0,4,0,0" />
             <TextBlock Style="{StaticResource TextCaption}" Margin="0,10,0,0" TextWrapping="Wrap"
                        Text="Bản demo: bấm Thanh toán sẽ giả lập thành công sau 2 giây, không có giao dịch thật." />
+            <TextBlock Style="{StaticResource TextCaption}" Margin="0,6,0,0" TextWrapping="Wrap"
+                       Text="Xem voucher đang phát hành trong Tài khoản. Thanh toán demo chưa hỗ trợ nhập mã voucher." />
         </StackPanel>
 
         <!-- Đang xử lý thanh toán -->

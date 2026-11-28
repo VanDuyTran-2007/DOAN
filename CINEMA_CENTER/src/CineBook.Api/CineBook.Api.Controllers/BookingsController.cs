@@ -86,14 +86,20 @@ public class BookingsController : ControllerBase
 				}
 			}
 		}
+		var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		var tier = userId is null ? null : await _db.Users.AsNoTracking()
+			.Where(user => user.Id == userId)
+			.Select(user => user.MemberTier)
+			.SingleOrDefaultAsync();
+		decimal subtotal = seatTotal + comboTotal;
 		Booking booking = new Booking
 		{
 			Id = Guid.NewGuid().ToString("N"),
 			Code = "CB" + Random.Shared.Next(100000, 999999),
-			UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+			UserId = userId,
 			ShowtimeId = req.ShowtimeId,
 			Status = "Pending",
-			TotalAmount = seatTotal + comboTotal,
+			TotalAmount = subtotal - Models.MemberPricing.DiscountAmount(subtotal, Models.MemberPricing.ReadTier(tier)),
 			IdempotencyKey = (string.IsNullOrWhiteSpace(req.HoldId) ? Guid.NewGuid().ToString("N") : req.HoldId),
 			CreatedAtUtc = now,
 			ExpiresAtUtc = now.AddMinutes(10.0)

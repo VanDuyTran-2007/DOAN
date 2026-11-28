@@ -6,13 +6,12 @@ public record AccountProfile(
     DateTimeOffset? AvatarCooldownUntil, int AvatarChangesRemaining, bool PasswordCheckLocked,
     bool RequiresPasswordSetup = false, IReadOnlyList<string>? LinkedProviders = null)
 {
-    public string Rank => MemberTier.ToLowerInvariant() switch
-    {
-        "owner" => "Owner",
-        "admin" => "Admin",
-        "vip" or "silver" or "gold" or "platinum" => "VIP",
-        _ => "Thành viên"
-    };
+    private MemberTier Tier => MemberPricing.ReadTier(MemberTier);
+    public string Rank => MemberPricing.DisplayName(Tier);
+    public int PurchaseDiscountPercent => MemberPricing.DiscountPercent(Tier);
+    public string PurchaseBenefit => PurchaseDiscountPercent > 0
+        ? $"Giảm {PurchaseDiscountPercent}% trên tổng tiền vé và combo"
+        : "Giá tiêu chuẩn khi mua vé và combo";
     public string DateOfBirth => BirthDate?.ToString("dd/MM/yyyy") ?? "Chưa cung cấp";
     public string Spending => Labels.Money(TotalSpent);
     public string AvatarStatus => AvatarCooldownUntil is { } until

@@ -57,8 +57,21 @@
 
             <Border Height="1" Background="{StaticResource NavyBorder}" Margin="0,14" />
 
+            <StackPanel Margin="0,0,0,8" Visibility="{Binding HasMemberDiscount, Converter={StaticResource BoolToVis}}">
+                <DockPanel LastChildFill="False">
+                    <TextBlock Text="Tạm tính" Style="{StaticResource TextCaption}" />
+                    <TextBlock DockPanel.Dock="Right" Text="{Binding Subtotal, Converter={StaticResource Money}}" Style="{StaticResource TextCaption}" />
+                </DockPanel>
+                <DockPanel LastChildFill="False" Margin="0,4,0,0">
+                    <TextBlock Text="{Binding MemberDiscountLabel}" Style="{StaticResource TextCaption}" Foreground="{StaticResource Success}" />
+                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource TextCaption}" Foreground="{StaticResource Success}">
+                        <Run Text="−" /><Run Text="{Binding MemberDiscount, Mode=OneWay, Converter={StaticResource Money}}" />
+                    </TextBlock>
+                </DockPanel>
+            </StackPanel>
+
             <Grid>
-                <TextBlock Text="Tổng cộng" VerticalAlignment="Center" FontWeight="SemiBold" />
+                <TextBlock Text="Cần thanh toán" VerticalAlignment="Center" FontWeight="SemiBold" />
                 <TextBlock Text="{Binding GrandTotal, Converter={StaticResource Money}}" HorizontalAlignment="Right" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentGold}" />
             </Grid>
 

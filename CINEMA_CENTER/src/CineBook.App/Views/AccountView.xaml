@@ -60,6 +60,7 @@
                                 <StackPanel>
                                     <TextBlock Text="Cấp độ tài khoản" Style="{StaticResource TextCaption}" />
                                     <TextBlock Text="{Binding Profile.Rank}" Style="{StaticResource TextH3}" Margin="0,6,0,0" />
+                                    <TextBlock Text="{Binding Profile.PurchaseBenefit}" Style="{StaticResource TextCaption}" TextWrapping="Wrap" Margin="0,6,0,0" />
                                 </StackPanel>
                             </Border>
                             <Border Style="{StaticResource AccountPanel}" Margin="7,0,0,0">

@@ -74,7 +74,12 @@ public partial class BookingViewModel : ViewModelBase
     public string UserName => _auth.CurrentUser?.FullName ?? "Khách";
     public decimal SeatsTotal => SelectedSeats.Sum(s => s.Price);
     public decimal CombosTotal => Combos.Sum(c => c.LineTotal);
-    public decimal GrandTotal => SeatsTotal + CombosTotal;
+    private MemberTier PurchaseTier => _auth.CurrentUser?.MemberTier ?? MemberTier.Standard;
+    public decimal Subtotal => SeatsTotal + CombosTotal;
+    public decimal MemberDiscount => MemberPricing.DiscountAmount(Subtotal, PurchaseTier);
+    public bool HasMemberDiscount => MemberDiscount > 0;
+    public string MemberDiscountLabel => $"Ưu đãi {MemberPricing.DisplayName(PurchaseTier)} ({MemberPricing.DiscountPercent(PurchaseTier)}%)";
+    public decimal GrandTotal => Subtotal - MemberDiscount;
     public string SelectedSeatsText => string.Join(", ", SelectedSeats.Select(s => s.Label));
     public bool HasSelectedSeats => SelectedSeats.Count > 0;
     public bool HasSelectedCombos => Combos.Any(c => c.Quantity > 0);
@@ -93,6 +98,7 @@ public partial class BookingViewModel : ViewModelBase
     // ---------- Khởi tạo ----------
     public override async Task OnNavigatedToAsync(object? parameter)
     {
+        _auth.AuthStateChanged += OnAuthStateChanged;
         var args = parameter as BookingArgs;
         IsBusy = true;
         try { await LoadShowtimeAsync(args?.ShowtimeId ?? ""); }
@@ -114,9 +120,12 @@ public partial class BookingViewModel : ViewModelBase
 
     public override void OnNavigatedFrom()
     {
+        _auth.AuthStateChanged -= OnAuthStateChanged;
         _timer.Stop();
         ReleaseHold();
     }
+
+    private void OnAuthStateChanged(object? sender, EventArgs e) => RefreshState();
 
     private async Task LoadShowtimeAsync(string showtimeId)
     {
@@ -163,7 +172,8 @@ public partial class BookingViewModel : ViewModelBase
     {
         UpdateSteps();
         foreach (var p in new[] { nameof(CanGoBack), nameof(CanGoNext), nameof(NextText), nameof(IsPayStep), nameof(SeatsTotal), nameof(CombosTotal),
-                                  nameof(GrandTotal), nameof(SelectedSeatsText), nameof(HasSelectedSeats), nameof(HasSelectedCombos), nameof(ChosenCombos) })
+                                  nameof(Subtotal), nameof(MemberDiscount), nameof(HasMemberDiscount), nameof(MemberDiscountLabel),
+                                  nameof(GrandTotal), nameof(UserName), nameof(SelectedSeatsText), nameof(HasSelectedSeats), nameof(HasSelectedCombos), nameof(ChosenCombos) })
             OnPropertyChanged(p);
         NextCommand.NotifyCanExecuteChanged();
     }

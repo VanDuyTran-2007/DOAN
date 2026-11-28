@@ -28,6 +28,7 @@
 	<ItemGroup>
 		<Compile Include="..\CineBook.App\Models\Entities.cs" Link="DemoData\Entities.cs" />
 		<Compile Include="..\CineBook.App\Models\Enums.cs" Link="DemoData\Enums.cs" />
+		<Compile Include="..\CineBook.App\Models\MemberPricing.cs" Link="DemoData\MemberPricing.cs" />
 		<Compile Include="..\CineBook.App\Services\Mock\MockData.cs" Link="DemoData\MockData.cs" />
 	</ItemGroup>
 </Project>

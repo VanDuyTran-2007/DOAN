@@ -264,11 +264,13 @@ public class MockBookingService : IBookingService
     private readonly Dictionary<string, (Booking Booking, string ShowtimeId, IReadOnlyList<string> SeatIds)> _pending = [];
     private readonly IShowtimeService _showtimes;
     private readonly ISeatService _seats;
+    private readonly IAuthService _auth;
 
-    public MockBookingService(IShowtimeService showtimes, ISeatService seats)
+    public MockBookingService(IShowtimeService showtimes, ISeatService seats, IAuthService auth)
     {
         _showtimes = showtimes;
         _seats = seats;
+        _auth = auth;
     }
 
     public async Task<IReadOnlyList<Combo>> GetCombosAsync(CancellationToken ct = default)
@@ -280,8 +282,9 @@ public class MockBookingService : IBookingService
         var st = await _showtimes.GetByIdAsync(r.ShowtimeId, ct) ?? throw new InvalidOperationException("Suất chiếu không tồn tại");
         var movie = MockData.Movies.First(m => m.Id == st.MovieId);
         var cinema = MockData.Cinemas.First(c => c.Id == st.CinemaId);
-        decimal total = r.SeatIds.Sum(id => MockSeatService.PriceFor(st, id[(id.LastIndexOf('-') + 1)..]))
+        decimal subtotal = r.SeatIds.Sum(id => MockSeatService.PriceFor(st, id[(id.LastIndexOf('-') + 1)..]))
                       + r.Combos.Sum(kv => MockData.Combos.First(c => c.Id == kv.Key).Price * kv.Value);
+        var tier = _auth.CurrentUser?.MemberTier ?? MemberTier.Standard;
         var booking = new Booking
         {
             Id = Guid.NewGuid().ToString("N"),
@@ -291,7 +294,7 @@ public class MockBookingService : IBookingService
             AuditoriumName = st.AuditoriumName,
             StartTime = st.StartTime,
             SeatLabels = r.SeatIds.Select(s => s[(s.LastIndexOf('-') + 1)..]).ToList(),
-            TotalAmount = total,
+            TotalAmount = subtotal - MemberPricing.DiscountAmount(subtotal, tier),
             Status = BookingStatus.Pending
         };
         _pending[booking.Id] = (booking, r.ShowtimeId, r.SeatIds);
