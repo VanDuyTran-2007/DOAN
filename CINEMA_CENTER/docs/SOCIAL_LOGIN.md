@@ -21,13 +21,12 @@ Nếu email đã tồn tại trong CineBook, đăng nhập bằng mật khẩu C
 
    Nếu ứng dụng nhà cung cấp ở chế độ thử nghiệm, cấp quyền cho các tài khoản thử theo cài đặt của nhà cung cấp. Chính sách về miền có thể yêu cầu xác minh khi mở ứng dụng cho người dùng ngoài nhóm thử. [Google OAuth cho ứng dụng web](https://developers.google.com/identity/protocols/oauth2/web-server) · [Thiết lập Facebook Login](https://learn.microsoft.com/aspnet/core/security/authentication/social/facebook-logins)
 
-3. Với profile **Local** hoặc **Tailscale Host** trong Visual Studio, lưu thông tin vào User Secrets trên máy chạy API. Có thể cấu hình từng nhà cung cấp độc lập.
+3. Với profile **Local** hoặc **Tailscale Host** trong Visual Studio, lưu thông tin vào User Secrets trên máy chạy API. Từ thư mục dự án, chạy script bên dưới rồi nhập các giá trị khi PowerShell hỏi. Nội dung nhập được ẩn. Dùng `-Provider Google` hoặc `-Provider Facebook` nếu chỉ cấu hình một nhà cung cấp.
 
    ```powershell
-   dotnet user-secrets --project src/CineBook.Api set "Authentication:Google:ClientId" "<Google Client ID>"
-   dotnet user-secrets --project src/CineBook.Api set "Authentication:Google:ClientSecret" "<Google Client Secret>"
-   dotnet user-secrets --project src/CineBook.Api set "Authentication:Facebook:AppId" "<Facebook App ID>"
-   dotnet user-secrets --project src/CineBook.Api set "Authentication:Facebook:AppSecret" "<Facebook App Secret>"
+   .\scripts\Set-OAuthSecrets.ps1
    ```
+
+   Sau khi lưu, khởi động lại API và thử hai nút trong WPF. User Secrets lưu cấu hình ngoài repo cho mục đích phát triển.
 
    Khi triển khai ngoài môi trường Development, cấu hình tương ứng bằng biến môi trường máy chủ, ví dụ `Authentication__Google__ClientId`. Máy thành viên chỉ cần URL API HTTPS và quyền truy cập mạng riêng. Các khóa của Google và Meta chỉ đặt trên máy chủ.

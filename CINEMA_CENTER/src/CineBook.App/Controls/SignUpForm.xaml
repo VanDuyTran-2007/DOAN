@@ -7,12 +7,12 @@
         <TextBlock Text="Họ và tên" Style="{StaticResource FieldLabel}" Margin="0,0,0,5" />
         <TextBox x:Name="NameBox" Text="{Binding SignUp.FullName, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"
                  h:FormField.HasInput="{Binding SignUp.FullName, Converter={StaticResource NotEmpty}}" />
-        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=NameBox}" />
+        <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=NameBox, Mode=OneWay}" />
 
         <TextBlock Text="Email" Style="{StaticResource FieldLabel}" />
         <TextBox x:Name="EmailBox" Text="{Binding SignUp.Email, UpdateSourceTrigger=PropertyChanged}" MaxLength="254"
                  h:FormField.HasInput="{Binding SignUp.Email, Converter={StaticResource NotEmpty}}" />
-        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=EmailBox}" />
+        <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=EmailBox, Mode=OneWay}" />
 
         <Grid>
             <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="10" /><ColumnDefinition /></Grid.ColumnDefinitions>
@@ -20,14 +20,14 @@
                 <TextBlock Text="Số điện thoại" Style="{StaticResource FieldLabel}" />
                 <TextBox x:Name="PhoneBox" Text="{Binding SignUp.Phone, UpdateSourceTrigger=PropertyChanged}" MaxLength="10"
                          h:FormField.HasInput="{Binding SignUp.Phone, Converter={StaticResource NotEmpty}}" />
-                <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PhoneBox}" />
+                <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PhoneBox, Mode=OneWay}" />
             </StackPanel>
             <StackPanel Grid.Column="2">
                 <TextBlock Text="Ngày sinh (dd/MM/yyyy)" Style="{StaticResource FieldLabel}" />
                 <TextBox x:Name="BirthBox" Text="{Binding SignUp.BirthDate, UpdateSourceTrigger=PropertyChanged}" MaxLength="10"
                          TextChanged="OnBirthDateChanged" InputScope="Digits"
                          h:FormField.HasInput="{Binding SignUp.BirthDate, Converter={StaticResource NotEmpty}}" />
-                <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=BirthBox}" />
+                <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=BirthBox, Mode=OneWay}" />
             </StackPanel>
         </Grid>
 
@@ -42,20 +42,20 @@
                      Visibility="{Binding SignUp.ShowPassword, Converter={StaticResource BoolToVis}}" />
             <ToggleButton Style="{StaticResource EyeToggle}" HorizontalAlignment="Right" IsChecked="{Binding SignUp.ShowPassword}" />
         </Grid>
-        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PwdBox}" />
+        <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=PwdBox, Mode=OneWay}" />
 
         <TextBlock Text="Nhập lại mật khẩu" Style="{StaticResource FieldLabel}" />
         <PasswordBox x:Name="ConfirmBox" h:PasswordHelper.Attach="True"
                      MaxLength="256" h:FormField.HasInput="{Binding SignUp.ConfirmPassword, Converter={StaticResource NotEmpty}}"
                      h:PasswordHelper.Password="{Binding SignUp.ConfirmPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=ConfirmBox}" />
+        <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=ConfirmBox, Mode=OneWay}" />
 
         <CheckBox x:Name="TermsBox" Margin="0,14,0,0" IsChecked="{Binding SignUp.AcceptTerms}">
             <TextBlock Text="Tôi đồng ý với Điều khoản sử dụng và Chính sách bảo mật" MaxWidth="330" TextWrapping="Wrap" />
         </CheckBox>
-        <TextBlock Style="{StaticResource FieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TermsBox}" />
+        <TextBox Style="{StaticResource CopyableFieldError}" Text="{Binding (Validation.Errors)[0].ErrorContent, ElementName=TermsBox, Mode=OneWay}" />
 
-        <TextBlock Text="{Binding ServerError}" Style="{StaticResource FieldError}" Margin="0,10,0,0" />
+        <TextBox Text="{Binding ServerError, Mode=OneWay}" Style="{StaticResource CopyableFieldError}" Margin="0,10,0,0" />
 
         <Button Style="{StaticResource SubmitButton}" Margin="0,14,0,0" Command="{Binding SignUpCommand}"
                 IsDefault="{Binding SelectedTab, Converter={StaticResource Equals}, ConverterParameter=1}"

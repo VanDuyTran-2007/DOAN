@@ -20,47 +20,55 @@
             </Rectangle>
         </Grid>
 
-        <!-- Slogan bên trái -->
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="90,0,0,0" MaxWidth="520">
-            <TextBlock Text="CineBook" FontSize="56" FontWeight="ExtraBold">
-                <TextBlock.Foreground>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="{StaticResource BurgundyHoverColor}" Offset="0" />
-                        <GradientStop Color="{StaticResource AccentGoldColor}" Offset="1" />
-                    </LinearGradientBrush>
-                </TextBlock.Foreground>
-            </TextBlock>
-            <TextBlock Text="Đặt vé xem phim nhanh chóng tại mọi hệ thống rạp: CGV, Lotte, BHD Star, Cinestar."
-                       Style="{StaticResource TextH3}" Foreground="{StaticResource TextSecondary}" FontWeight="Normal" TextWrapping="Wrap" Margin="0,10,0,0" />
-        </StackPanel>
+        <Grid Margin="32,66,32,24" MaxWidth="1160">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="420" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Slogan bên trái -->
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" MaxWidth="480">
+                <TextBlock Text="CineBook" FontSize="56" FontWeight="ExtraBold">
+                    <TextBlock.Foreground>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="{StaticResource BurgundyHoverColor}" Offset="0" />
+                            <GradientStop Color="{StaticResource AccentGoldColor}" Offset="1" />
+                        </LinearGradientBrush>
+                    </TextBlock.Foreground>
+                </TextBlock>
+                <TextBlock Text="Đặt vé xem phim nhanh chóng tại mọi hệ thống rạp: CGV, Lotte, BHD Star, Cinestar."
+                           Style="{StaticResource TextH3}" Foreground="{StaticResource TextSecondary}" FontWeight="Normal" TextWrapping="Wrap" Margin="0,10,0,0" />
+            </StackPanel>
+
+            <!-- ============ PANEL KÍNH MỜ (glassmorphism) ============
+                 WPF không có backdrop-blur. Cách làm:
+                 1) BlurLayer: một Border lớn hơn panel 40px mỗi phía, tô bằng VisualBrush của BackgroundLayer (nền đang chạy),
+                    rồi áp BlurEffect. Code-behind chỉnh Viewbox của brush để đúng vùng nền nằm dưới panel.
+                 2) GlassPanel bị cắt (Clip) bo góc 16px để phần blur tràn ra ngoài không hiện.
+                 3) Phủ lên trên: nền #0B1A33 opacity 0.55 + viền trắng 1px opacity 0.15. -->
+            <Grid x:Name="GlassPanel" Grid.Column="2" VerticalAlignment="Center"
+                  SizeChanged="OnLayoutChanged">
+                <Border x:Name="BlurLayer" Margin="-40">
+                    <Border.Effect><BlurEffect Radius="30" KernelType="Gaussian" /></Border.Effect>
+                </Border>
+                <Border Background="{StaticResource GlassFill}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" CornerRadius="16" />
+
+                <ScrollViewer Margin="28,24,20,24" Padding="0,0,8,0" VerticalScrollBarVisibility="Auto">
+                    <TabControl x:Name="Tabs" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" SelectionChanged="OnTabChanged">
+                        <TabItem Header="Đăng nhập"><ctl:SignInForm /></TabItem>
+                        <TabItem Header="Đăng ký"><ctl:SignUpForm /></TabItem>
+                    </TabControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
 
         <!-- Nút quay lại -->
-        <Button Style="{StaticResource GhostButton}" Command="{Binding BackHomeCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,20,0,0" Padding="12,8">
+        <Button Style="{StaticResource GhostButton}" Command="{Binding BackHomeCommand}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="24,12,0,0" Padding="12,8">
             <StackPanel Orientation="Horizontal">
                 <Path Data="{StaticResource IconArrowBack}" Fill="{StaticResource TextPrimary}" Width="16" Height="16" Stretch="Uniform" Margin="0,0,8,0" />
                 <TextBlock Text="Quay lại trang chủ" Foreground="{StaticResource TextPrimary}" />
             </StackPanel>
         </Button>
-
-        <!-- ============ PANEL KÍNH MỜ (glassmorphism) ============
-             WPF không có backdrop-blur. Cách làm:
-             1) BlurLayer: một Border lớn hơn panel 40px mỗi phía, tô bằng VisualBrush của BackgroundLayer (nền đang chạy),
-                rồi áp BlurEffect. Code-behind chỉnh Viewbox của brush để đúng vùng nền nằm dưới panel.
-             2) GlassPanel bị cắt (Clip) bo góc 16px để phần blur tràn ra ngoài không hiện.
-             3) Phủ lên trên: nền #0B1A33 opacity 0.55 + viền trắng 1px opacity 0.15. -->
-        <Grid x:Name="GlassPanel" Width="420" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,40,90,40"
-              SizeChanged="OnLayoutChanged">
-            <Border x:Name="BlurLayer" Margin="-40">
-                <Border.Effect><BlurEffect Radius="30" KernelType="Gaussian" /></Border.Effect>
-            </Border>
-            <Border Background="{StaticResource GlassFill}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" CornerRadius="16" />
-
-            <StackPanel Margin="28,24,28,24">
-                <TabControl x:Name="Tabs" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" SelectionChanged="OnTabChanged">
-                    <TabItem Header="Đăng nhập"><ctl:SignInForm /></TabItem>
-                    <TabItem Header="Đăng ký"><ctl:SignUpForm /></TabItem>
-                </TabControl>
-            </StackPanel>
-        </Grid>
     </Grid>
 </UserControl>

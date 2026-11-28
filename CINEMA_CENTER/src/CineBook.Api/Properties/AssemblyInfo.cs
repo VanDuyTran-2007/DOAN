@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 [assembly: AssemblyCompany("CineBook.Api")]
 [assembly: AssemblyConfiguration("Debug")]
@@ -12,3 +13,5 @@ using Microsoft.AspNetCore.Mvc.ApplicationParts;
 [assembly: AssemblyTitle("CineBook.Api")]
 [assembly: ApplicationPart("Microsoft.AspNetCore.OpenApi")]
 [assembly: AssemblyVersion("1.0.0.0")]
+// Keep this in sync with UserSecretsId in CineBook.Api.csproj.
+[assembly: UserSecretsId("CineBook.Api-Development")]

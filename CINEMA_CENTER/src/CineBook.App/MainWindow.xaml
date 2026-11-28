@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:ctl="clr-namespace:CineBook.Controls"
-        Title="CineBook" Width="1366" Height="800" MinWidth="1280" MinHeight="720"
+        Title="CineBook" Width="1366" Height="800" MinWidth="920" MinHeight="560"
+        WindowState="Maximized"
         WindowStartupLocation="CenterScreen" Background="{StaticResource NavyDarkest}"
         FontFamily="{StaticResource AppFont}">
 
@@ -16,7 +17,6 @@
     <Grid x:Name="RootGrid" Background="{StaticResource NavyDarkest}">
         <Grid.RowDefinitions>
             <RowDefinition Height="36" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -39,14 +39,20 @@
             </StackPanel>
         </Grid>
 
-        <!-- Header (ẩn ở trang Đăng nhập/Đăng ký) -->
-        <ctl:HeaderView Grid.Row="1" DataContext="{Binding Header}"
-                        Visibility="{Binding DataContext.IsHeaderVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" />
-
-        <!-- Vùng nội dung điều hướng -->
-        <ctl:TransitionContentControl Grid.Row="2" Content="{Binding Current}" />
-
-        <!-- Toast phủ lên toàn bộ -->
-        <ctl:ToastHost Grid.Row="1" Grid.RowSpan="2" DataContext="{Binding Toast}" />
+        <Grid Grid.Row="1" ClipToBounds="True" SizeChanged="OnWorkspaceSizeChanged">
+            <Grid>
+                <Grid.LayoutTransform>
+                    <ScaleTransform x:Name="WorkspaceScale" />
+                </Grid.LayoutTransform>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ctl:HeaderView DataContext="{Binding Header}"
+                                Visibility="{Binding DataContext.IsHeaderVisible, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVis}}" />
+                <ctl:TransitionContentControl Grid.Row="1" Content="{Binding Current}" />
+                <ctl:ToastHost Grid.RowSpan="2" DataContext="{Binding Toast}" />
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

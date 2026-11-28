@@ -11,12 +11,24 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = viewModel;
         StateChanged += OnStateChanged;
+        OnStateChanged(this, EventArgs.Empty);
     }
 
     private void OnMinimize(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
     private void OnMaximize(object sender, RoutedEventArgs e)
         => WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
     private void OnClose(object sender, RoutedEventArgs e) => Close();
+
+    private void OnWorkspaceSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.NewSize.Width <= 0 || e.NewSize.Height <= 0) return;
+
+        const double designWidth = 1280;
+        const double designHeight = 684;
+        double scale = Math.Min(1, Math.Min(e.NewSize.Width / designWidth, e.NewSize.Height / designHeight));
+        WorkspaceScale.ScaleX = scale;
+        WorkspaceScale.ScaleY = scale;
+    }
 
     // Cửa sổ không viền khi phóng to sẽ tràn ra ngoài màn hình ~8px → bù lại bằng Margin.
     private void OnStateChanged(object? sender, EventArgs e)
