@@ -57,7 +57,9 @@
 
         <TextBlock Text="{Binding ServerError}" Style="{StaticResource FieldError}" Margin="0,10,0,0" />
 
-        <Button Style="{StaticResource SubmitButton}" Margin="0,14,0,0" Command="{Binding SignUpCommand}" IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
+        <Button Style="{StaticResource SubmitButton}" Margin="0,14,0,0" Command="{Binding SignUpCommand}"
+                IsDefault="{Binding SelectedTab, Converter={StaticResource Equals}, ConverterParameter=1}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}">
             <TextBlock Text="Tạo tài khoản" Foreground="{StaticResource TextPrimary}" />
         </Button>
 
